@@ -13,6 +13,9 @@
 //# define GS_USE_TRACE2 // Render
 # include <sig/gs_trace.h>
 
+#define _USE_MATH_DEFINES
+#include <math.h>
+
 //======================================= GlrLines ====================================
 
 GlrMyNode::GlrMyNode ()
@@ -85,6 +88,13 @@ void GlrMyNode::render ( SnShape* s, GlContext* ctx )
 		if ( w<=0 || h<=0 ) return; // invalid parameters
 
 		GsArray<GsVec> P(0,6); // will hold the points forming my triangles (size 0, but pre-allocate 6 spaces)
+
+		/*for (float theta = 0.0; theta < 2 * M_PI; theta + M_PI / 6) {
+
+		}*/
+
+
+
 		P.push() = o;
 		P.push() = o+GsVec(w,0,0);
 		P.push() = o+GsVec(w,h,0);

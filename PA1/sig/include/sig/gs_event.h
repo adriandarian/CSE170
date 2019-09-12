@@ -41,7 +41,7 @@ class GsEvent
 					KeyUp=65362, KeyDown=65364, KeyLeft=65361, KeyRight=65363,
 					KeyEnd=65367, KeyPgDn=65366, KeyPgUp=65365, KeyHome=65360,
 					KeyShift=653505, KeyCtrl=65507, KeyAlt=65313, KeySpace=32,
-					KeyEnter=65293 };
+					KeyEnter=65293, KeyQ=113, KeyA=97, KeyW=119, KeyS=115, KeyE=101, KeyD=100 };
 
    public : //--- event occured :
 	Type type;	 //!< The type of the occured event

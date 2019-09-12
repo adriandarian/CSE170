@@ -26,7 +26,7 @@ void MyViewer::add_mynode ( int n )
 	SnMyNode* c;
 
 	float r=0.15f; // position range
-	while ( n-->0 )
+	while ( n-- > 0 )
 	{
 		c = new SnMyNode;
 		if ( mcolorbut->value() )
@@ -39,7 +39,7 @@ void MyViewer::add_mynode ( int n )
 		c->height = gs_random(0.001f,r*2);
 
 		// Example how to print/debug your generated data:
-		// gsout<<n<<": "<<c->color()<<gsnl;
+		gsout<<n<<": "<<c->color()<<gsnl;
 
 		rootg()->add(c);
 	}
@@ -53,7 +53,12 @@ int MyViewer::handle_keyboard ( const GsEvent &e )
 	switch ( e.key )
 	{	case GsEvent::KeyEsc : gs_exit(); return 1;
 		case GsEvent::KeyLeft: gsout<<"Left\n"; return 1;
-		// etc
+		case GsEvent::KeyQ: gsout << "Q\n"; return 1;
+		case GsEvent::KeyA: gsout << "A\n"; return 1;
+		case GsEvent::KeyW: gsout << "W\n"; return 1;
+		case GsEvent::KeyS: gsout << "S\n"; return 1;
+		case GsEvent::KeyE: gsout << "E\n"; return 1;
+		case GsEvent::KeyD: gsout << "D\n"; return 1;
 		default: gsout<<"Key pressed: "<<e.key<<gsnl;
 	}
 
