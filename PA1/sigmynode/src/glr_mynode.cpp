@@ -85,13 +85,16 @@ void GlrMyNode::render ( SnShape* s, GlContext* ctx )
 	{	GsPnt o = c.init;
 		float w = c.width;
 		float h = c.height;
+		float n = 1.0f;
 		if ( w<=0 || h<=0 ) return; // invalid parameters
 
 		GsArray<GsVec> P(0,6); // will hold the points forming my triangles (size 0, but pre-allocate 6 spaces)
 
-		/*for (float theta = 0.0; theta < 2 * M_PI; theta + M_PI / 6) {
-
-		}*/
+		for (float theta = 0.0f; theta < 2 * M_PI; theta + M_PI * n) {
+			for (float phi = 0.0f; phi < 2 * M_PI; phi + M_PI * n) {
+				P.push() = GsVec();
+			}
+		}
 
 
 
