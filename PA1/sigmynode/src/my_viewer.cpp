@@ -43,15 +43,49 @@ int MyViewer::handle_keyboard ( const GsEvent &e )
 	int ret = WsViewer::handle_keyboard ( e ); // 1st let system check events
 	if ( ret ) return ret;
 
+	SnMyNode* c = (SnMyNode*)rootg()->get(0);
+
 	switch ( e.key )
 	{	case GsEvent::KeyEsc : gs_exit(); return 1;
 		case GsEvent::KeyLeft: gsout<<"Left\n"; return 1;
-		case GsEvent::KeyQ: gsout << "Q\n"; return 1;
-		case GsEvent::KeyA: gsout << "A\n"; return 1;
-		case GsEvent::KeyW: gsout << "W\n"; return 1;
-		case GsEvent::KeyS: gsout << "S\n"; return 1;
-		case GsEvent::KeyE: gsout << "E\n"; return 1;
-		case GsEvent::KeyD: gsout << "D\n"; return 1;
+		case GsEvent::KeyQ: 
+			gsout << "Q\n";
+			c->n += 1.0f;
+			c->touch();
+			redraw();
+			return 1;
+		case GsEvent::KeyA: 
+			gsout << "A\n";
+			if (c->n - 1.0f == 3.0f)
+				return 1;
+			c->n -= 1.0f;
+			c->touch();
+			redraw();
+			return 1;
+		case GsEvent::KeyW: 
+			gsout << "W\n"; 
+			c->r += 0.01f;
+			c->touch();
+			redraw();
+			return 1;
+		case GsEvent::KeyS: 
+			gsout << "S\n";
+			c->r -= 0.01f;
+			c->touch();
+			redraw();
+			return 1;
+		case GsEvent::KeyE: 
+			gsout << "E\n"; 
+			c->R += 0.01f;
+			c->touch();
+			redraw();
+			return 1;
+		case GsEvent::KeyD: 
+			gsout << "D\n";
+			c->R -= 0.01f;
+			c->touch();
+			redraw();
+			return 1;
 		default: gsout<<"Key pressed: "<<e.key<<gsnl;
 	}
 
