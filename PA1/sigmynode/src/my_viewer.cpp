@@ -15,10 +15,10 @@ void MyViewer::add_ui ()
 	UiPanel *p;
 	UiManager* uim = WsWindow::uim();
 	p = uim->add_panel ( "", UiPanel::HorizLeft );
-	p->add ( new UiButton ( "It's Showtime", EvAdd ) );
+	p->add ( new UiButton ( "Add", EvAdd ) );
 	p->add ( mcolorbut=new UiCheckButton ( "Multicolor", EvMultiColor ) );
 	p->add ( new UiButton ( "OpenGL", EvInfo ) );
-	p->add ( new UiButton ( "HASTA LA VISTA, BABY", EvExit ) );
+	p->add ( new UiButton ( "Exit", EvExit ) );
 }
 
 void MyViewer::add_mynode ( int n )
@@ -26,23 +26,16 @@ void MyViewer::add_mynode ( int n )
 	SnMyNode* c;
 
 	float r=0.15f; // position range
-	while ( n-- > 0 )
-	{
 		c = new SnMyNode;
 		if ( mcolorbut->value() )
 			c->multicolor = true;
 		else
 			c->color ( GsColor::random() );
 
-		c->init.set ( gs_random(-r,r), gs_random(-r,r), gs_random(-r,r) );
-		c->width = gs_random(0.001f,r);
-		c->height = gs_random(0.001f,r*2);
+		c->init.set(0, 0, 0);
 
-		// Example how to print/debug your generated data:
-		gsout<<n<<": "<<c->color()<<gsnl;
 
 		rootg()->add(c);
-	}
 }
 
 int MyViewer::handle_keyboard ( const GsEvent &e )

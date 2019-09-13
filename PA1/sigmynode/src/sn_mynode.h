@@ -12,6 +12,9 @@ class SnMyNode : public SnShape
 	GsVec init;
 	float width; // default is 0.5f
 	float height; // default is 1.0f
+	float r;
+	float R;
+	float n;
 	bool multicolor; // default is false
 
    public :

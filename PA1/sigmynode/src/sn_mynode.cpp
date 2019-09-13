@@ -9,7 +9,11 @@ SnMyNode::SnMyNode () : SnShape ( class_name )
 {
 	width = 0.5f;
 	height = 1.0f;
-	multicolor = false;
+	multicolor = true;
+	r = 0.5f;
+	R = 1.0f;
+	n = 10.0f;
+
 	if ( !SnMyNode::renderer_instantiator ) SnMyNodeRegisterRenderer();
 }
 

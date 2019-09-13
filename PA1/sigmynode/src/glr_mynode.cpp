@@ -13,9 +13,6 @@
 //# define GS_USE_TRACE2 // Render
 # include <sig/gs_trace.h>
 
-#define _USE_MATH_DEFINES
-#include <math.h>
-
 //======================================= GlrLines ====================================
 
 GlrMyNode::GlrMyNode ()
@@ -82,28 +79,41 @@ void GlrMyNode::render ( SnShape* s, GlContext* ctx )
 
 	// 1. Set buffer data if node has been changed:
 	if ( s->changed()&SnShape::Changed ) // flags are: Unchanged, RenderModeChanged, MaterialChanged, Changed
-	{	GsPnt o = c.init;
-		float w = c.width;
-		float h = c.height;
-		float n = 1.0f;
-		if ( w<=0 || h<=0 ) return; // invalid parameters
+	{	//GsPnt o = c.init;
+		//float w = c.width;
+		//float h = c.height;
+		float r = c.r;
+		float R = c.R;
+		float n = c.n;
+		// if ( w<=0 || h<=0 ) return; // invalid parameters
 
-		GsArray<GsVec> P(0,6); // will hold the points forming my triangles (size 0, but pre-allocate 6 spaces)
+		GsArray<GsVec> P(0, 4 * gs_pow(int(n), 2)); // will hold the points forming my triangles (size 0, but pre-allocate 6 spaces)
 
-		for (float theta = 0.0f; theta < 2 * M_PI; theta + M_PI * n) {
-			for (float phi = 0.0f; phi < 2 * M_PI; phi + M_PI * n) {
-				P.push() = GsVec();
+		for (float theta = 0.0f; theta < GS_2PI; theta += float(GS_2PI / n)) {
+			for (float phi = 0.0f; phi < GS_2PI; phi += float(GS_2PI / n)) {
+				GsVec p1((R + r * cos(theta)) * cos(phi), (R + r * cos(theta)) * sin(phi), r * sin(theta));
+				GsVec p2((R + r * cos(theta + (GS_2PI / n))) * cos(phi), (R + r * cos(theta + (GS_2PI / n))) * sin(phi), r * sin(theta + (GS_2PI / n)));
+				GsVec p3((R + r * cos(theta)) * cos(phi + (GS_2PI / n)), (R + r * cos(theta)) * sin(phi + (GS_2PI / n)), r * sin(theta));
+				GsVec p4((R + r * cos(theta + (GS_2PI / n))) * cos(phi + (GS_2PI / n)), (R + r * cos(theta + (GS_2PI / n))) * sin(phi + (GS_2PI / n)), r * sin(theta + (GS_2PI / n)));
+				
+				P.push() = p2;
+				P.push() = p3;
+				P.push() = p4;
+
+				P.push() = p3;
+				P.push() = p2;
+				P.push() = p1;
 			}
 		}
 
 
 
-		P.push() = o;
+	/*	P.push() = o;
 		P.push() = o+GsVec(w,0,0);
 		P.push() = o+GsVec(w,h,0);
 		P.push() = o;
 		P.push() = o+GsVec(w,h,0);
-		P.push() = o+GsVec(0,h,0);
+		P.push() = o+GsVec(0,h,0);*/
 
 		glBindVertexArray ( _glo.va[0] );
 		glEnableVertexAttribArray ( 0 );
