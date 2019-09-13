@@ -47,15 +47,13 @@ int MyViewer::handle_keyboard ( const GsEvent &e )
 
 	switch ( e.key )
 	{	case GsEvent::KeyEsc : gs_exit(); return 1;
-		case GsEvent::KeyLeft: gsout<<"Left\n"; return 1;
-		case GsEvent::KeyQ: 
-			gsout << "Q\n";
+		case GsEvent::KeyLeft: return 1;
+		case GsEvent::KeyQ:
 			c->n += 1.0f;
 			c->touch();
 			redraw();
 			return 1;
 		case GsEvent::KeyA: 
-			gsout << "A\n";
 			if (c->n - 1.0f == 3.0f)
 				return 1;
 			c->n -= 1.0f;
@@ -63,25 +61,25 @@ int MyViewer::handle_keyboard ( const GsEvent &e )
 			redraw();
 			return 1;
 		case GsEvent::KeyW: 
-			gsout << "W\n"; 
 			c->r += 0.01f;
 			c->touch();
 			redraw();
 			return 1;
 		case GsEvent::KeyS: 
-			gsout << "S\n";
+			if (c->r - 0.01f == 0.2f)
+				return 1;
 			c->r -= 0.01f;
 			c->touch();
 			redraw();
 			return 1;
 		case GsEvent::KeyE: 
-			gsout << "E\n"; 
 			c->R += 0.01f;
 			c->touch();
 			redraw();
 			return 1;
 		case GsEvent::KeyD: 
-			gsout << "D\n";
+			if (c->R - 0.1f <= c->r)
+				return 1;
 			c->R -= 0.01f;
 			c->touch();
 			redraw();

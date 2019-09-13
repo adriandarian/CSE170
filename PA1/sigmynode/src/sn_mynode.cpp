@@ -9,7 +9,7 @@ SnMyNode::SnMyNode () : SnShape ( class_name )
 {
 	width = 0.5f;
 	height = 1.0f;
-	multicolor = true;
+	multicolor = false;
 	r = 0.5f;
 	R = 1.0f;
 	n = 10.0f;

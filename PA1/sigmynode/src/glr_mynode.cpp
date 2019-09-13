@@ -88,6 +88,7 @@ void GlrMyNode::render ( SnShape* s, GlContext* ctx )
 
 		for (float theta = 0.0f; theta < GS_2PI; theta += float(GS_2PI / n)) {
 			for (float phi = 0.0f; phi < GS_2PI; phi += float(GS_2PI / n)) {
+				// Counter Clockwise Rotation
 				P.push() = GsVec((R + r * cos(theta)) * cos(phi + (GS_2PI / n)), (R + r * cos(theta)) * sin(phi + (GS_2PI / n)), r * sin(theta));
 				P.push() = GsVec((R + r * cos(theta + (GS_2PI / n))) * cos(phi + (GS_2PI / n)), (R + r * cos(theta + (GS_2PI / n))) * sin(phi + (GS_2PI / n)), r * sin(theta + (GS_2PI / n)));
 				P.push() = GsVec((R + r * cos(theta + (GS_2PI / n))) * cos(phi), (R + r * cos(theta + (GS_2PI / n))) * sin(phi), r * sin(theta + (GS_2PI / n)));
