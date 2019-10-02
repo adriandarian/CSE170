@@ -1,0 +1,48 @@
+VISUAL STUDIO
+
+The support code provides project files for Visual Studio. We use the Visual Studio Community version, which is a free version and it works great.
+
+If you install Visual Studio, you just need to install the "Desktop Development with C++" option. Both versions 2017 and 2019 can be used.
+
+https://www.visualstudio.com/downloads/download-visual-studio-vs
+
+SUPPORT CODE
+
+Our support code SIG is available at:
+https://bitbucket.org/mkallmann/sig/
+
+A pre-compiled version will be also posted in CatCourses.
+
+RUNNING THE SIG EXAMPLES
+
+- Un7zip the SIG support code in your work directory.
+- In the file manager go inside the vs2017 folder.
+- Double click sigfull.sln from inside the vs2017 folder to launch VS.
+- Right-Click on an example project to select it.
+- You can run it with Ctrl+F5 (or from one of the menu commands)
+- The 7zip will have pre-compiled libraries, to re-compile you need to re-build the solution
+- Executables and libraries are smaller if you select "Release" mode in the toolbar.
+- Recall that when you work in a lab computer your desktop files are erased, so be sure to save your work in a safe place.
+
+SIG FORUM
+
+Of course, come to the labs to ask for help and exchange ideas. In addition, this year we will be using a forum to help answer questions:
+
+=> https://sigdev.boardhost.com/
+
+WORKING ON PAs and PROJECTs
+
+- You will typically work with 2 Visual Studio instances: one with SIG so that you can read header files and check how the examples are implemented, and another with your project/PA in development.
+- Both projects have to be on the same folder.
+
+ASSIGNMENTS
+
+- Lab assignments will be posted in CatCourses -> Files -> PAs
+- Keep checking the schedule available in schedule.pdf, this
+  document will be periodically updated
+
+EXTRAS
+
+- Be sure to read the recent announcements in the CatCourses system.
+- Also, keep checking the information in CatCourses -> Files
+

@@ -1,0 +1,9 @@
+CSE170 Recommended textbook:
+
+Fundamentals of Computer Graphics 
+4th edition
+by Peter Shirley, Michael Ashikhmin, Steve Marschner
+CRC Press
+
+If you already have the 3rd Edition, this is fine.
+

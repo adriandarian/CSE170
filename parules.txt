@@ -1,0 +1,54 @@
+CSE-170 PROGRAMMING ASSIGNMENTS (PAs)
+
+A PA will start on a Tuesday or Thursday lab according to the posted schedule.pdf document. The starting lab is when the assignment will be explained and implementation details will be given. You will then have 2 additional labs to work on it and present the PA to your TA. In total you will have 3 full labs to work on each PA. 
+
+We will only accept 2 delayed PA presentations, each with a 20% penalty, and for a delay of at most one week. Otherwise your assignment wil be graded as zero if delayed.
+
+PRESENTATION
+
+PAs have to be completed at most by *30 minutes* before the end of a deadline lab, when you will have to show the assignment to the TA in order to have it graded. You will mainly be showing that your program follows all requirements and answer a few questions about your project. You can show your PA anytime before the deadline. Note that it is not enough to show your code running, you must explain and show that you understand your solution.
+
+SUPPORT CODE
+
+We will use our own software SIG. You may choose another support code but only if you are completely able to use that code on your own. We will only provide help for project development in SIG. And of course, in all cases, all the requirements of the PAs have to be fully implemented by yourself and not be executed by bult-in functions of your support code. Please read supportcode.txt for details on SIG.
+
+SUBMISSION
+
+You also have to submit your PA on-line. For that, do this:
+1) Make sure that your project compiles!
+2) Run the provided clean.bat file so that unnecessary files are deleted (object files, etc.)
+3) Compress the directory of your project into one package (zip, 7z) (do not include SIG)
+4) Then upload your file to CatCourses/Canvas to the correct PA entry before the deadline.
+
+The deadline for uploading is *until 2h after the end of the respective lab deadline*. If you have to re-submit your code (always before the deadline), you have to notify your TA so that he knows about it. If you re-submit your code you will then be required to present your PA again so that you can explain the changes (unless the changes are very minor).
+
+It is a requirement that your project compiles and runs. Make sure it does not depend on any files outside the package you are submitting.
+
+GRADING
+
+Each PA has clear information about how it will be graded and the requirements will be checked during your presentation to the TA. 
+
+The following rules are strict:
+1) If you do not submit or present a PA, it will get a zero.
+2) If the submitted code does not compile, and the problem is not a trivial fix, the PA will get a zero. 
+3) If your PA has compilation or organization problems, or weak commenting/coding styles, you may be discounted points.
+4) It is your responsibility to submit your compressed package in the assignment section without any problems. Do not send code to the instructor or TA by email.
+
+Two or three optional PAs will be available later along the course in case you need to increase your grade. Each optional PA will replace your worst PA grade, if the replacement gives you a better grade. You may use an optional PA to replace a zero grade.
+ 
+LABS
+
+During the labs the TA will be explaining how to develop the assignments and projects. Labs are also very useful to exchange ideas with your colleagues, to see the solutions of others, and to learn more about computer graphics. Several implementation issues arise and are explained during the labs. Although not enforced, Lab attendance is important. You should be able to develop most of the assignments during the lab times. Do not leave it for the last moment. 
+
+You may discuss solutions with your colleagues but do not copy or exchange code - all PAs are individual projects. You have to develop yourself all the core parts of the PA. It is only allwed to use 3rd party software if you are adding functionality. Talk to your TA before adding external code. All PA requirements have to be implemented with your own code.
+
+PROJECTS
+
+The 2 projects will mostly follow the same grading and submission rules; however, you will have more time to complete a project. The specific deadlines and requirements will be specified when each project description is posted.
+
+SHARING CODE IS NOT ALLOWED
+
+Talking and discussing ideas with your fellow students is welcomed and encouraged, however, lines of code cannot be shared. You may learn from code in the web but you have to re-implement it in your solution. Re-using code from the web is acceptable only if it is improving your PA without implementing the core requirements.
+
+=>IMPORTANT: All submissions will be checked for copied lines of code by automatic tools. In case cheating is detected the CS Dept Policy on Academic Honesty will be applied: 1st infraction is a zero on the assignment, 2nd infraction is an F in the class. Infractions are counted across all CSE classes. Read CSE Academic Honesty Policy.pdf
+
