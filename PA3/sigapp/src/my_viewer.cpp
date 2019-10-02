@@ -1,36 +1,39 @@
+#include <vector>
+#include <string>
+#include "my_viewer.h"
 
-# include "my_viewer.h"
+#include <sigogl/ui_button.h>
+#include <sigogl/ui_radio_button.h>
+#include <sig/sn_primitive.h>
+#include <sig/sn_transform.h>
+#include <sig/sn_manipulator.h>
 
-# include <sigogl/ui_button.h>
-# include <sigogl/ui_radio_button.h>
-# include <sig/sn_primitive.h>
-# include <sig/sn_transform.h>
-# include <sig/sn_manipulator.h>
+#include <sigogl/ws_run.h>
 
-# include <sigogl/ws_run.h>
-
-MyViewer::MyViewer ( int x, int y, int w, int h, const char* l ) : WsViewer(x,y,w,h,l)
+MyViewer::MyViewer(int x, int y, int w, int h, const char *l) : WsViewer(x, y, w, h, l)
 {
-	_nbut=0;
-	_animating=false;
-	build_ui ();
-	build_scene ();
+	_nbut = 0;
+	_animating = false;
+	build_ui();
+	build_scene();
 }
 
-void MyViewer::build_ui ()
+void MyViewer::build_ui()
 {
 	UiPanel *p, *sp;
-	UiManager* uim = WsWindow::uim();
-	p = uim->add_panel ( "", UiPanel::HorizLeft );
-	p->add ( new UiButton ( "View", sp=new UiPanel() ) );
-	{	UiPanel* p=sp;
-		p->add ( _nbut=new UiCheckButton ( "Normals", EvNormals ) ); 
+	UiManager *uim = WsWindow::uim();
+	p = uim->add_panel("", UiPanel::HorizLeft);
+	p->add(new UiButton("View", sp = new UiPanel()));
+	{
+		UiPanel *p = sp;
+		p->add(_nbut = new UiCheckButton("Normals", EvNormals));
 	}
-	p->add ( new UiButton ( "Animate", EvAnimate ) );
-	p->add ( new UiButton ( "Exit", EvExit ) ); p->top()->separate();
+	p->add(new UiButton("Animate", EvAnimate));
+	p->add(new UiButton("Exit", EvExit));
+	p->top()->separate();
 }
 
-void MyViewer::add_model ( SnShape* s, GsVec p )
+void MyViewer::add_model(SnShape *s, GsVec p)
 {
 	// This method demonstrates how to add some elements to our scene graph: lines,
 	// and a shape, and all in a group under a SnManipulator.
@@ -40,13 +43,13 @@ void MyViewer::add_model ( SnShape* s, GsVec p )
 	// You would then add the transform as 1st element of the group, and set g->separator(true).
 	// Your scene graph should always be carefully designed according to your application needs.
 
-	SnManipulator* manip = new SnManipulator;
+	SnManipulator *manip = new SnManipulator;
 	GsMat m;
-	m.translation ( p );
-	manip->initial_mat ( m );
+	m.translation(p);
+	manip->initial_mat(m);
 
-	SnGroup* g = new SnGroup;
-	SnLines* l = new SnLines;
+	SnGroup *g = new SnGroup;
+	SnLines *l = new SnLines;
 	l->color(GsColor::orange);
 	g->add(s);
 	g->add(l);
@@ -56,106 +59,172 @@ void MyViewer::add_model ( SnShape* s, GsVec p )
 	rootg()->add(manip);
 }
 
-void MyViewer::build_scene ()
+void MyViewer::build_scene()
 {
-	SnPrimitive* p;
+	SnGroup *g = new SnGroup; // to hold all the models and transformation
+	SnModel *model[3];		  // to hold all the models
+	SnTransform *t[3];		  // to hold all the transformation
+	GsMat m[3];				  // to hold all the transformation matrices
+	GsBox b0, b1, b2;
+	std::vector<GsBox> b = {b0, b1, b2};
+	std::vector<std::string> pieces = {"rupperarm.m", "rlowerarm.m", "rhand.m"};
 
-	p = new SnPrimitive(GsPrimitive::Box,1,3,1);
-	p->prim().material.diffuse=GsColor::yellow;
-	add_model ( p, GsVec(0,0,0) );
+	for (int i = 0; i < 3; i++)
+	{
+		model[i] = new SnModel;
+		t[i] = new SnTransform;
 
-	p = new SnPrimitive(GsPrimitive::Sphere,2);
-	p->prim().material.diffuse=GsColor::red;
-	add_model ( p, GsVec(-4,0,0) );
+		if (!model[i]->model()->load(("../../arm/" + pieces[i]).c_str()))
+		{
+			gsout << (pieces[i] + " was not loaded").c_str() << gsnl;
+		}
 
-	p = new SnPrimitive(GsPrimitive::Cylinder,1.0,1.0,1.5);
-	p->prim().material.diffuse=GsColor::blue;
-	add_model ( p, GsVec(4,0,0) );
+		model[i]->model()->centralize();
+		model[i]->model()->get_bounding_box(b0);
+		if (i == 0)
+		{
+			float x = 0.0f;
+			float y = 0.0f;
+			float z = -(b[i].dz() / 2.0f) + 24.0f;
+			m[i].translation(GsVec(x, y, z));
+			gsout << z << gsnl;
+		}
+		else if (i == 1)
+		{
+			float x = 0.0f;
+			float y = 0.0f;
+			float z = b[i].dz() / 2.0f;
+			m[i].translation(GsVec(x, y, z));
+			gsout << z << gsnl;
+		}
+		else if (i == 2)
+		{
+			float x = 0.0f;
+			float y = 0.0f;
+			float z = -((b[1].dz() / 2.0f) + b2.dz());
+			m[i].translation(GsVec(x, y, z));
+			gsout << z << gsnl;
+		}
+		t[i]->set(m[0]);
 
-	p = new SnPrimitive(GsPrimitive::Capsule,1,1,3);
-	p->prim().material.diffuse=GsColor::red;
-	add_model ( p, GsVec(8,0,0) );
+		g->add(t[i]);
+		g->add(model[i]);
+	}
 
-	p = new SnPrimitive(GsPrimitive::Ellipsoid,2.0,0.5);
-	p->prim().material.diffuse=GsColor::green;
-	add_model ( p, GsVec(-8,0,0) );
+	rootg()->add(g);
 }
 
 // Below is an example of how to control the main loop of an animation:
-void MyViewer::run_animation ()
+void MyViewer::run_animation()
 {
-	if ( _animating ) return; // avoid recursive calls
+	if (_animating)
+		return; // avoid recursive calls
 	_animating = true;
-	
-	int ind = gs_random ( 0, rootg()->size()-1 ); // pick one child
-	SnManipulator* manip = rootg()->get<SnManipulator>(ind); // access one of the manipulators
+
+	int ind = gs_random(0, rootg()->size() - 1);			 // pick one child
+	SnManipulator *manip = rootg()->get<SnManipulator>(ind); // access one of the manipulators
 	GsMat m = manip->mat();
 
-	double frdt = 1.0/30.0; // delta time to reach given number of frames per second
-	double v = 4; // target velocity is 1 unit per second
-	double t=0, lt=0, t0=gs_time();
+	double frdt = 1.0 / 30.0; // delta time to reach given number of frames per second
+	double v = 4;			  // target velocity is 1 unit per second
+	double t = 0, lt = 0, t0 = gs_time();
 	do // run for a while:
-	{	while ( t-lt<frdt ) { ws_check(); t=gs_time()-t0; } // wait until it is time for next frame
-		double yinc = (t-lt)*v;
-		if ( t>2 ) yinc=-yinc; // after 2 secs: go down
+	{
+		while (t - lt < frdt)
+		{
+			ws_check();
+			t = gs_time() - t0;
+		} // wait until it is time for next frame
+		double yinc = (t - lt) * v;
+		if (t > 2)
+			yinc = -yinc; // after 2 secs: go down
 		lt = t;
 		m.e24 += (float)yinc;
-		if ( m.e24<0 ) m.e24=0; // make sure it does not go below 0
-		manip->initial_mat ( m );
-		render(); // notify it needs redraw
+		if (m.e24 < 0)
+			m.e24 = 0; // make sure it does not go below 0
+		manip->initial_mat(m);
+		render();   // notify it needs redraw
 		ws_check(); // redraw now
-	}	while ( m.e24>0 );
+	} while (m.e24 > 0);
 	_animating = false;
 }
 
-void MyViewer::show_normals ( bool view )
+void MyViewer::show_normals(bool view)
 {
 	// Note that primitives are only converted to meshes in GsModel
 	// at the first draw call.
 	GsArray<GsVec> fn;
-	SnGroup* r = (SnGroup*)root();
-	for ( int k=0; k<r->size(); k++ )
-	{	SnManipulator* manip = r->get<SnManipulator>(k);
-		SnShape* s = manip->child<SnGroup>()->get<SnShape>(0);
-		SnLines* l = manip->child<SnGroup>()->get<SnLines>(1);
-		if ( !view ) { l->visible(false); continue; }
-		l->visible ( true );
-		if ( !l->empty() ) continue; // build only once
+	SnGroup *r = (SnGroup *)root();
+	for (int k = 0; k < r->size(); k++)
+	{
+		SnManipulator *manip = r->get<SnManipulator>(k);
+		SnShape *s = manip->child<SnGroup>()->get<SnShape>(0);
+		SnLines *l = manip->child<SnGroup>()->get<SnLines>(1);
+		if (!view)
+		{
+			l->visible(false);
+			continue;
+		}
+		l->visible(true);
+		if (!l->empty())
+			continue; // build only once
 		l->init();
-		if ( s->instance_name()==SnPrimitive::class_name )
-		{	GsModel& m = *((SnModel*)s)->model();
-			m.get_normals_per_face ( fn );
-			const GsVec* n = fn.pt();
+		if (s->instance_name() == SnPrimitive::class_name)
+		{
+			GsModel &m = *((SnModel *)s)->model();
+			m.get_normals_per_face(fn);
+			const GsVec *n = fn.pt();
 			float f = 0.33f;
-			for ( int i=0; i<m.F.size(); i++ )
-			{	const GsVec& a=m.V[m.F[i].a]; l->push ( a, a+(*n++)*f );
-				const GsVec& b=m.V[m.F[i].b]; l->push ( b, b+(*n++)*f );
-				const GsVec& c=m.V[m.F[i].c]; l->push ( c, c+(*n++)*f );
+			for (int i = 0; i < m.F.size(); i++)
+			{
+				const GsVec &a = m.V[m.F[i].a];
+				l->push(a, a + (*n++) * f);
+				const GsVec &b = m.V[m.F[i].b];
+				l->push(b, b + (*n++) * f);
+				const GsVec &c = m.V[m.F[i].c];
+				l->push(c, c + (*n++) * f);
 			}
-		}  
+		}
 	}
 }
 
-int MyViewer::handle_keyboard ( const GsEvent &e )
+int MyViewer::handle_keyboard(const GsEvent &e)
 {
-	int ret = WsViewer::handle_keyboard ( e ); // 1st let system check events
-	if ( ret ) return ret;
+	int ret = WsViewer::handle_keyboard(e); // 1st let system check events
+	if (ret)
+		return ret;
 
-	switch ( e.key )
-	{	case GsEvent::KeyEsc : gs_exit(); return 1;
-		case 'n' : { bool b=!_nbut->value(); _nbut->value(b); show_normals(b); return 1; }
-		default: gsout<<"Key pressed: "<<e.key<<gsnl;
+	switch (e.key)
+	{
+	case GsEvent::KeyEsc:
+		gs_exit();
+		return 1;
+	case 'n':
+	{
+		bool b = !_nbut->value();
+		_nbut->value(b);
+		show_normals(b);
+		return 1;
+	}
+	default:
+		gsout << "Key pressed: " << e.key << gsnl;
 	}
 
 	return 0;
 }
 
-int MyViewer::uievent ( int e )
+int MyViewer::uievent(int e)
 {
-	switch ( e )
-	{	case EvNormals: show_normals(_nbut->value()); return 1;
-		case EvAnimate: run_animation(); return 1;
-		case EvExit: gs_exit();
+	switch (e)
+	{
+	case EvNormals:
+		show_normals(_nbut->value());
+		return 1;
+	case EvAnimate:
+		run_animation();
+		return 1;
+	case EvExit:
+		gs_exit();
 	}
 	return WsViewer::uievent(e);
 }
