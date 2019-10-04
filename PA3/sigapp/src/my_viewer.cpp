@@ -59,7 +59,7 @@ void MyViewer::add_model(SnShape *s, GsVec p)
 	rootg()->add(manip);
 }
 
-void MyViewer::build_scene()
+void MyViewer::build_scene(float shoulder = 0.0f, float elbow = 0.0f, float hand = 0.0f)
 {
 	g = new SnGroup; // to hold all the models and transformation
 	b = {b0, b1, b2};
@@ -83,8 +83,8 @@ void MyViewer::build_scene()
 			float y = 0.0f;
 			float z = -(b[i].dz() / 2.0f) + 24.0f;
 			m[i].translation(GsVec(x, y, z));
+			m[i].roty(shoulder);
 			gsout << z << gsnl;
-			shoulderOrigin = z;
 		}
 		else if (i == 1)
 		{
@@ -92,8 +92,8 @@ void MyViewer::build_scene()
 			float y = 0.0f;
 			float z = b[i].dz() / 2.0f;
 			m[i].translation(GsVec(x, y, z));
+			m[i].roty(elbow);
 			gsout << z << gsnl;
-			elbowOrigin = z;
 		}
 		else if (i == 2)
 		{
@@ -101,8 +101,8 @@ void MyViewer::build_scene()
 			float y = 0.0f;
 			float z = -((b[1].dz() / 2.0f) + b2.dz());
 			m[i].translation(GsVec(x, y, z));
+			m[i].roty(hand);
 			gsout << z << gsnl;
-			handOrigin = z;
 		}
 		t[i]->set(m[0]);
 
@@ -190,6 +190,8 @@ void MyViewer::show_normals(bool view)
 int MyViewer::handle_keyboard(const GsEvent &e)
 {
 	int ret = WsViewer::handle_keyboard(e); // 1st let system check events
+	float a = 0.05f;
+
 	if (ret)
 		return ret;
 
@@ -207,26 +209,37 @@ int MyViewer::handle_keyboard(const GsEvent &e)
 	}
 	case GsEvent::KeyQ:
 	{
-		shoulder += (float)(GS_PI / 6);
-		m[0].rotz(shoulder);
+		shoulder -= a;
+		rootg()->remove_all();
+		build_scene(shoulder, elbow, hand);
+
+
+
+
+		// m[0].rotz(shoulder);
 	
-		t[0]->set(m[0]);
-		render();
-		ws_check();
+		// t[0]->set(m[0]);
+		// render();
+		// ws_check();
 		return 1;
 	}
 	case GsEvent::KeyA:
 	{
-			shoulder -= (float)(GS_PI / 6);
-		m[0].rotz(shoulder);
+		shoulder += a;
+		rootg()->remove_all();
+		build_scene(shoulder, elbow, hand);
+
+
+
+		// m[0].roty(shoulder);
 	
-		// gsout << m[0].getrans << gsnl;
-		t[0]->set(m[0]);
-		// g->add(t[0]);
+		// // gsout << m[0].getrans << gsnl;
+		// t[0]->set(m[0]);
+		// // g->add(t[0]);
 		
-		// rootg()->add(g);
-		render();
-		ws_check();
+		// // rootg()->add(g);
+		// render();
+		// ws_check();
 		return 1;
 	}
 	case GsEvent::KeyW:
