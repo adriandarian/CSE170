@@ -61,13 +61,9 @@ void MyViewer::add_model(SnShape *s, GsVec p)
 
 void MyViewer::build_scene()
 {
-	SnGroup *g = new SnGroup; // to hold all the models and transformation
-	SnModel *model[3];		  // to hold all the models
-	SnTransform *t[3];		  // to hold all the transformation
-	GsMat m[3];				  // to hold all the transformation matrices
-	GsBox b0, b1, b2;
-	std::vector<GsBox> b = {b0, b1, b2};
-	std::vector<std::string> pieces = {"rupperarm.m", "rlowerarm.m", "rhand.m"};
+	g = new SnGroup; // to hold all the models and transformation
+	b = {b0, b1, b2};
+	pieces = {"rupperarm.m", "rlowerarm.m", "rhand.m"};
 
 	for (int i = 0; i < 3; i++)
 	{
@@ -79,7 +75,7 @@ void MyViewer::build_scene()
 			gsout << (pieces[i] + " was not loaded").c_str() << gsnl;
 		}
 
-		model[i]->model()->centralize();
+		// model[i]->model()->centralize();
 		model[i]->model()->get_bounding_box(b0);
 		if (i == 0)
 		{
@@ -88,6 +84,7 @@ void MyViewer::build_scene()
 			float z = -(b[i].dz() / 2.0f) + 24.0f;
 			m[i].translation(GsVec(x, y, z));
 			gsout << z << gsnl;
+			shoulderOrigin = z;
 		}
 		else if (i == 1)
 		{
@@ -96,6 +93,7 @@ void MyViewer::build_scene()
 			float z = b[i].dz() / 2.0f;
 			m[i].translation(GsVec(x, y, z));
 			gsout << z << gsnl;
+			elbowOrigin = z;
 		}
 		else if (i == 2)
 		{
@@ -104,6 +102,7 @@ void MyViewer::build_scene()
 			float z = -((b[1].dz() / 2.0f) + b2.dz());
 			m[i].translation(GsVec(x, y, z));
 			gsout << z << gsnl;
+			handOrigin = z;
 		}
 		t[i]->set(m[0]);
 
@@ -204,6 +203,50 @@ int MyViewer::handle_keyboard(const GsEvent &e)
 		bool b = !_nbut->value();
 		_nbut->value(b);
 		show_normals(b);
+		return 1;
+	}
+	case GsEvent::KeyQ:
+	{
+		shoulder += (float)(GS_PI / 6);
+		m[0].rotz(shoulder);
+	
+		t[0]->set(m[0]);
+		render();
+		ws_check();
+		return 1;
+	}
+	case GsEvent::KeyA:
+	{
+			shoulder -= (float)(GS_PI / 6);
+		m[0].rotz(shoulder);
+	
+		// gsout << m[0].getrans << gsnl;
+		t[0]->set(m[0]);
+		// g->add(t[0]);
+		
+		// rootg()->add(g);
+		render();
+		ws_check();
+		return 1;
+	}
+	case GsEvent::KeyW:
+	{
+		redraw();
+		return 1;
+	}
+	case GsEvent::KeyS:
+	{
+		redraw();
+		return 1;
+	}
+	case GsEvent::KeyE:
+	{
+		redraw();
+		return 1;
+	}
+	case GsEvent::KeyD:
+	{
+		redraw();
 		return 1;
 	}
 	default:
