@@ -13,16 +13,12 @@ class MyViewer : public WsViewer
 	UiCheckButton* _nbut;
 	bool _animating;
 	bool _smooth = true;
-	//int torusFace = 10;
-	float th;
-	float ph;
-	float R;
-	float r;
-	float n;
-	//double pi;
-	float pi;
-	float dth;
-	bool tSmooth;
+	float R = 1.0f;
+	float r = 0.2f;
+	float n = 10.0f;
+	int a = 0;
+	int b = 1;
+	int c = 2;
 
    public :
 	MyViewer ( int x, int y, int w, int h, const char* l );
@@ -31,7 +27,7 @@ class MyViewer : public WsViewer
 	void build_scene ();
 	void show_normals ( bool view );
 	void run_animation ();
-	//void compute_segments(bool smooth);
+	void compute_segments(bool smooth, bool view);
 	virtual int handle_keyboard ( const GsEvent &e ) override;
 	virtual int uievent ( int e ) override;
 

@@ -1,25 +1,3 @@
-﻿  main.cpp
-C:\Users\adria\Documents\CSE170\PA4\sigapp\src\my_viewer.h(16,9): error C2143:  syntax error: missing ';' before '*'
-C:\Users\adria\Documents\CSE170\PA4\sigapp\src\my_viewer.h(16,9): error C4430:  missing type specifier - int assumed. Note: C++ does not support default-int
-  my_viewer.cpp
-C:\Users\adria\Documents\CSE170\PA4\sigapp\src\my_viewer.h(16,32): error C2238:  unexpected token(s) preceding ';'
-C:\Users\adria\Documents\CSE170\PA4\sigapp\src\my_viewer.h(16,9): error C2143:  syntax error: missing ';' before '*'
-C:\Users\adria\Documents\CSE170\PA4\sigapp\src\my_viewer.h(16,9): error C4430:  missing type specifier - int assumed. Note: C++ does not support default-int
-C:\Users\adria\Documents\CSE170\PA4\sigapp\src\my_viewer.h(16,32): error C2238:  unexpected token(s) preceding ';'
-C:\Users\adria\Documents\CSE170\PA4\sigapp\src\my_viewer.cpp(95,4): error C2065:  'myTorus': undeclared identifier
-C:\Users\adria\Documents\CSE170\PA4\sigapp\src\my_viewer.cpp(96,4): error C2065:  'myTorus': undeclared identifier
-C:\Users\adria\Documents\CSE170\PA4\sigapp\src\my_viewer.cpp(97,4): error C2065:  'myTorus': undeclared identifier
-C:\Users\adria\Documents\CSE170\PA4\sigapp\src\my_viewer.cpp(99,4): error C2065:  'myTorus': undeclared identifier
-C:\Users\adria\Documents\CSE170\PA4\sigapp\src\my_viewer.cpp(100,4): error C2065:  'myTorus': undeclared identifier
-C:\Users\adria\Documents\CSE170\PA4\sigapp\src\my_viewer.cpp(101,4): error C2065:  'myTorus': undeclared identifier
-C:\Users\adria\Documents\CSE170\PA4\sigapp\src\my_viewer.cpp(103,4): error C2065:  'myTorus': undeclared identifier
-C:\Users\adria\Documents\CSE170\PA4\sigapp\src\my_viewer.cpp(104,4): error C2065:  'myTorus': undeclared identifier
-C:\Users\adria\Documents\CSE170\PA4\sigapp\src\my_viewer.cpp(113,5): error C2065:  'myTorus': undeclared identifier
-C:\Users\adria\Documents\CSE170\PA4\sigapp\src\my_viewer.cpp(114,5): error C2065:  'myTorus': undeclared identifier
-C:\Users\adria\Documents\CSE170\PA4\sigapp\src\my_viewer.cpp(115,5): error C2065:  'myTorus': undeclared identifier
-C:\Users\adria\Documents\CSE170\PA4\sigapp\src\my_viewer.cpp(117,5): error C2065:  'myTorus': undeclared identifier
-C:\Users\adria\Documents\CSE170\PA4\sigapp\src\my_viewer.cpp(118,5): error C2065:  'myTorus': undeclared identifier
-C:\Users\adria\Documents\CSE170\PA4\sigapp\src\my_viewer.cpp(119,5): error C2065:  'myTorus': undeclared identifier
-C:\Users\adria\Documents\CSE170\PA4\sigapp\src\my_viewer.cpp(121,5): error C2065:  'myTorus': undeclared identifier
-  Generating Code...
-C:\Users\adria\Documents\CSE170\PA4\sigapp\src\my_viewer.cpp(130,19): error C2065:  'myTorus': undeclared identifier
+﻿  my_viewer.cpp
+  sigapp.vcxproj -> C:\Users\adria\Documents\CSE170\PA4\sigapp\vs2019\\obj\sigapp_Debug_x64_v142\sigapp64mdd.exe
+          1 file(s) copied.

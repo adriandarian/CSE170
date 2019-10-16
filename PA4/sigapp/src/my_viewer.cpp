@@ -9,6 +9,9 @@
 
 # include <sigogl/ws_run.h>
 
+GsModel* Torus = new GsModel;
+SnModel* sn;
+
 MyViewer::MyViewer ( int x, int y, int w, int h, const char* l ) : WsViewer(x,y,w,h,l)
 {
 	_nbut=0;
@@ -57,68 +60,33 @@ void MyViewer::add_model ( SnShape* s, GsVec p )
 }
 
 void MyViewer::build_scene ()
-{	
-	GsModel* myTorus;
-	//GsArray<GsVec> P(0, 6);
-	myTorus = new GsModel;
-	SnModel* sn;
-	float x = 0.0f;
-	float y = 0.0f;
-	float z = 0.0f;
-	float thRad = GS_TORAD(float(th));
-	float phRad = GS_TORAD(float(ph));
-	tSmooth = true;
-	th = 0.0f;
-	ph = 0.0f;
-	R = 1.0f;
-	r = 0.2f;
-	n = 10.0f;
-	pi = 2.0f * 3.14156f;
-	dth = pi / n;
+{
 
-	int a = 0;
-	int b = 1;
-	int c = 2;
+	for (float theta = 0.0f; theta < GS_2PI; theta += float(GS_2PI / n)) {
+		for (float phi = 0.0f; phi < GS_2PI; phi += float(GS_2PI / n)) { //132234			
+			Torus->V.push() = GsVec(float(R + r * cos(theta)) * cos(phi), float(R + r * cos(theta)) * sin(phi), r * sin(theta));
+			Torus->V.push() = GsVec(float(R + r * cos(theta)) * cos(phi + float(GS_2PI / n)), (R + r * cos(theta)) * sin(phi + (GS_2PI / n)), r * sin(theta));
+			Torus->V.push() = GsVec(float(R + r * cos(theta + (GS_2PI / n))) * cos(phi), float(R + r * cos(theta + (GS_2PI / n))) * sin(phi), r * sin(theta + (GS_2PI / n)));
 
-	for (th = 0.0; th < 2 * pi; th += dth) {
-		for (ph = 0.0; ph < 2 * pi; ph += dth) {
-			//Peset locations for the 6 points based on Torus formulas
-			GsVec p1((R + r * cos(th)) * cos(ph), (R + r * cos(th)) * sin(ph), r * sin(th));
-			GsVec p2((R + (r * cos(th + dth))) * cos(ph), (R + r * cos(th + dth)) * sin(ph), r * sin(th + dth));
-			GsVec p3((R + r * cos(th)) * cos(ph + dth), (R + r * cos(th)) * sin(ph + dth), r * sin(th));
-			GsVec p4((R + r * cos(th + dth)) * cos(ph + dth), (R + r * cos(th + dth)) * sin(ph + dth), r * sin(th + dth));
-			
-			GsModel::Face f1 = GsModel::Face(0, 1, 2);
-			GsModel::Face f2 = GsModel::Face(a + 3, b + 3, c + 3);
+			Torus->V.push() = GsVec(float(R + r * cos(theta + (GS_2PI / n))) * cos(phi), float(R + r * cos(theta + (GS_2PI / n))) * sin(phi), r * sin(theta + (GS_2PI / n)));
+			Torus->V.push() = GsVec(float(R + r * cos(theta)) * cos(phi + (GS_2PI / n)), float(R + r * cos(theta)) * sin(phi + (GS_2PI / n)), r * sin(theta));
+			Torus->V.push() = GsVec(float(R + r * cos(theta + (GS_2PI / n))) * cos(phi + (GS_2PI / n)), float(R + r * cos(theta + (GS_2PI / n))) * sin(phi + (GS_2PI / n)), r * sin(theta + (GS_2PI / n)));
 
-			//First triangle
-			myTorus->V.push() = p1;
-			myTorus->V.push() = p3;
-			myTorus->V.push() = p4;
-			//Second triangle
-			myTorus->V.push() = p3;
-			myTorus->V.push() = p4;
-			myTorus->V.push() = p2;
+			Torus->F.push() = GsModel::Face(a, b, c);
+			Torus->F.push() = GsModel::Face(a + 3, b + 3, c + 3);
 
-			myTorus->F.push() = f1;
-			myTorus->F.push() = f2;
+			if (_smooth) { //132143
+				Torus->N.push() = GsVec(float(R + r * cosf(GS_TORAD(theta))) * cosf(GS_TORAD(phi)), float(R + r * cosf(GS_TORAD(theta))) * sinf(GS_TORAD(phi)), float(r * sinf(GS_TORAD(theta))));
+				Torus->N.push() = GsVec(float(R + r * cosf(GS_TORAD(theta + (GS_2PI / n)))) * cosf(GS_TORAD(phi + (GS_2PI / n))), float(R + r * cosf(GS_TORAD(theta + (GS_2PI / n)))) * sinf(GS_TORAD(phi + (GS_2PI / n))), float(r * sinf(GS_TORAD(theta + (GS_2PI / n)))));
+				Torus->N.push() = GsVec(float(R + r * cosf(GS_TORAD(theta + (GS_2PI / n)))) * cosf(GS_TORAD(phi)), float(R + r * cosf(GS_TORAD(theta + (GS_2PI / n)))) * sinf(GS_TORAD(phi)), float(r * sinf(GS_TORAD(theta + (GS_2PI / n)))));
 
-			if (tSmooth) {
-				
-				p1 = GsVec(float(R + r * cosf(phRad)) * cosf(thRad), float(R + r * cosf(phRad)) * sinf(thRad), float(r * sinf(phRad)));
-				p2 = GsVec(float(R + r * cosf(phRad)) * cosf(thRad), float(R + r * cosf(phRad)) * sinf(thRad), float(r * sinf(phRad)));
-				p3 = GsVec(float(R + r * cosf(phRad)) * cosf(thRad), float(R + r * cosf(phRad)) * sinf(thRad), float(r * sinf(phRad)));
-				p4 = GsVec(float(R + r * cosf(phRad)) * cosf(thRad), float(R + r * cosf(phRad)) * sinf(thRad), float(r * sinf(phRad)));
+				Torus->N.push() = GsVec(float(R + r * cosf(GS_TORAD(theta))) * cosf(GS_TORAD(phi)), float(R + r * cosf(GS_TORAD(theta))) * sinf(GS_TORAD(phi)), float(r * sinf(GS_TORAD(theta))));
+				Torus->N.push() = GsVec(float(R + r * cosf(GS_TORAD(theta))) * cosf(GS_TORAD(phi + (GS_2PI / n))), float(R + r * cosf(GS_TORAD(theta))) * sinf(GS_TORAD(phi + (GS_2PI / n))), float(r * sinf(GS_TORAD(theta))));
+				Torus->N.push() = GsVec(float(R + r * cosf(GS_TORAD(theta + (GS_2PI / n)))) * cosf(GS_TORAD(phi + (GS_2PI / n))), float(R + r * cosf(GS_TORAD(theta + (GS_2PI / n)))) * sinf(GS_TORAD(phi + (GS_2PI / n))), float(r * sinf(GS_TORAD(theta + (GS_2PI / n)))));
 
-				myTorus->N.push() = p1;
-				myTorus->N.push() = p3;
-				myTorus->N.push() = p4;
-
-				myTorus->N.push() = p3;
-				myTorus->N.push() = p4;
-				myTorus->N.push() = p2;
-
-				myTorus->set_mode(GsModel::Smooth, GsModel::NoMtl);
+				Torus->set_mode(GsModel::Smooth, GsModel::NoMtl);
+			} else {
+				Torus->set_mode(GsModel::Flat, GsModel::NoMtl);
 			}
 
 			a += 6;
@@ -127,7 +95,7 @@ void MyViewer::build_scene ()
 		}
 	}
 
-	sn = new SnModel(myTorus);
+	sn = new SnModel(Torus);
 	add_model(sn, GsVec(0, 0, 0));
 }
 
@@ -158,6 +126,38 @@ void MyViewer::run_animation ()
 	_animating = false;
 }
 
+void MyViewer::compute_segments(bool smooth, bool view) {
+	SnLines* l = new SnLines;
+	l->init();
+	l->color(GsColor::orange);
+
+	if (!view) { 
+		l->visible(false);
+	} else {
+		l->visible(true);
+	}
+
+	gsout << view << gsnl;
+
+	if (!smooth) {
+		GsModel& m = *sn->model();
+		for (int i = 0; i < m.F.size(); i++) {
+			const GsVec& a = m.V[m.F[i].a];
+			const GsVec& b = m.V[m.F[i].b];
+			const GsVec& c = m.V[m.F[i].c];
+			GsVec fcenter = (a + b + c) / 3.0f;
+			l->push(fcenter, fcenter + (m.N[i] * 2));
+		}
+	} else {
+		GsModel& m = *sn->model();
+		for (int i = 0; i < m.V.size(); i++) {
+			l->push(m.V[i], m.V[i] + m.N[i] * 2);
+		}
+	}
+
+	rootg()->add(l);
+}
+
 void MyViewer::show_normals ( bool view )
 {
 	// Note that primitives are only converted to meshes in GsModel
@@ -165,7 +165,8 @@ void MyViewer::show_normals ( bool view )
 	GsArray<GsVec> fn;
 	SnGroup* r = (SnGroup*)root();
 	for ( int k=0; k<r->size(); k++ )
-	{	SnManipulator* manip = r->get<SnManipulator>(k);
+	{	
+		SnManipulator* manip = r->get<SnManipulator>(k);
 		SnShape* s = manip->child<SnGroup>()->get<SnShape>(0);
 		SnLines* l = manip->child<SnGroup>()->get<SnLines>(1);
 		if ( !view ) { l->visible(false); continue; }
@@ -173,12 +174,14 @@ void MyViewer::show_normals ( bool view )
 		if ( !l->empty() ) continue; // build only once
 		l->init();
 		if ( s->instance_name()==SnPrimitive::class_name )
-		{	GsModel& m = *((SnModel*)s)->model();
+		{	
+			GsModel& m = *((SnModel*)s)->model();
 			m.get_normals_per_face ( fn );
 			const GsVec* n = fn.pt();
 			float f = 0.33f;
 			for ( int i=0; i<m.F.size(); i++ )
-			{	const GsVec& a=m.V[m.F[i].a]; l->push ( a, a+(*n++)*f );
+			{	
+				const GsVec& a=m.V[m.F[i].a]; l->push ( a, a+(*n++)*f );
 				const GsVec& b=m.V[m.F[i].b]; l->push ( b, b+(*n++)*f );
 				const GsVec& c=m.V[m.F[i].c]; l->push ( c, c+(*n++)*f );
 			}
@@ -193,9 +196,52 @@ int MyViewer::handle_keyboard ( const GsEvent &e )
 
 	switch ( e.key )
 	{	case GsEvent::KeyEsc : gs_exit(); return 1;
-		case 'n' : { bool b=!_nbut->value(); _nbut->value(b); show_normals(b); return 1; }
-		case 'q': ++n;
-			render();
+		case 'q':
+			n += 1.0f;
+			redraw();
+			return 1;
+		case 'a': 
+			if (n - 1.0f == 3.0f)
+				return 1;
+			n -= 1.0f;
+			redraw();
+			return 1;
+		case 'w': 
+			r += 0.01f;
+			redraw();
+			return 1;
+		case 's': 
+			if (r - 0.01f == 0.2f)
+				return 1;
+			r -= 0.01f;
+			redraw();
+			return 1;
+		case 'e': 
+			R += 0.01f;
+			redraw();
+			return 1;
+		case 'd': 
+			if (R - 0.1f <= r)
+				return 1;
+			R -= 0.01f;
+			redraw();
+			return 1;
+		case 'z':
+			_smooth = false;
+			redraw();
+			return 1;
+		case 'x':
+			_smooth = true;
+			redraw();
+			return 1;
+		case 'c':
+			compute_segments(_smooth, true);
+			redraw();
+			return 1;
+		case 'v':
+			compute_segments(_smooth, false);
+			redraw();
+			return 1;
 		default: gsout<<"Key pressed: "<<e.key<<gsnl;
 
 	}
