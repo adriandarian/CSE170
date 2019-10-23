@@ -1,3 +1,5 @@
-﻿  my_viewer.cpp
+﻿  main.cpp
+  my_viewer.cpp
+  Generating Code...
   sigapp.vcxproj -> C:\Users\adria\Documents\CSE170\PA4\sigapp\vs2019\\obj\sigapp_Debug_x64_v142\sigapp64mdd.exe
           1 file(s) copied.

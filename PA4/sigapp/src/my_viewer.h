@@ -16,7 +16,8 @@ class MyViewer : public WsViewer
 	float r;
 	float R;
 	float n;
-	double delta;
+	bool smooth;
+
    public :
 	MyViewer ( int x, int y, int w, int h, const char* l );
 	void build_ui ();
@@ -24,7 +25,7 @@ class MyViewer : public WsViewer
 	void build_scene ();
 	void show_normals ( bool view );
 	void run_animation ();
-	void compute_segments(bool flat);
+	void compute_segments(bool smooth);
 	virtual int handle_keyboard ( const GsEvent &e ) override;
 	virtual int uievent ( int e ) override;
 };

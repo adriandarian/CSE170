@@ -9,20 +9,12 @@
 #include <sig/sn_group.h>
 
 #include <sigogl/ws_run.h>
-bool flat;
-
-int numFaces = 10;
-
-
-double pie = 6.28f; // GS_2PI; //2pi
-double theta;		//outer circle
-double phi;			// inner circle
 
 MyViewer::MyViewer(int x, int y, int w, int h, const char *l) : WsViewer(x, y, w, h, l)
 {
-	 r = 0.1f;
-	 R = 0.5f;
-	 n = 60.0F;
+	float r = 0.1f;
+	float R = 0.5f;
+	n = 60.0F;
 	_nbut = 0;
 	_animating = false;
 	build_ui();
@@ -68,71 +60,40 @@ void MyViewer::build_scene()
 	SnModel *sn;
 
 	int i = 0;
-	////gsout << cos(3.14) << gsnl;
-	//gsout << cos(60) << gsnl;
-
-	delta = pie / n;
-	for (theta = 0.0; theta < pie; theta += delta) //nested for loop
+	for (float theta = 0.0f; theta < GS_2PI; theta += (float)(GS_2PI / n))
 	{
-		for (phi = 0.0; phi < pie; phi += delta)
+		for (float phi = 0.0f; phi < GS_2PI; phi += (float)(GS_2PI / n))
 		{
-			//create 6 vectors for the two triangles
-			//Triangle 1 ACD
-			//Triangle 2 ADB
-			GsVec A((R + r * cos(theta)) * cos(phi), (R + r * cos(theta)) * sin(phi), r * sin(theta));
-			GsVec B((R + r * cos(theta + delta)) * cos(phi), (R + r * cos(theta + delta)) * sin(phi), r * sin(theta + delta));
-			GsVec C((R + r * cos(theta)) * cos(phi + delta), (R + r * cos(theta)) * sin(phi + delta), r * sin(theta));
-			GsVec D((R + r * cos(theta + delta)) * cos(phi + delta), (R + r * cos(theta + delta)) * sin(phi + delta), r * sin(theta + delta));
-
-			torus->V.push() = A; //0
-			torus->V.push() = B; //1
-			torus->V.push() = C; //2
-			torus->V.push() = D; //3
-
-			/*torus->V.push() = A;
-			torus->V.push() = D;
-			torus->V.push() = C;
-
-			torus->V.push() = A;
-			torus->V.push() = D;
-			torus->V.push() = B;*/
+			torus->V.push() = GsVec((R + r * cos(theta)) * cos(phi), (R + r * cos(theta)) * sin(phi), r * sin(theta));
+			torus->V.push() = GsVec((R + r * cos(theta + (float)(GS_2PI / n))) * cos(phi), (R + r * cos(theta + (float)(GS_2PI / n))) * sin(phi), r * sin(theta + (float)(GS_2PI / n)));
+			torus->V.push() = GsVec((R + r * cos(theta)) * cos(phi + (float)(GS_2PI / n)), (R + r * cos(theta)) * sin(phi + (float)(GS_2PI / n)), r * sin(theta));
+			torus->V.push() = GsVec((R + r * cos(theta + (float)(GS_2PI / n))) * cos(phi + (float)(GS_2PI / n)), (R + r * cos(theta + (float)(GS_2PI / n))) * sin(phi + (float)(GS_2PI / n)), r * sin(theta + (float)(GS_2PI / n)));
 
 			GsModel::Face f1 = GsModel::Face(i, i + 2, i + 3);
-			GsModel::Face f2 = GsModel::Face(i, i + 3, i + 1);
-			/*	GsModel::Face f1 = GsModel::Face(i, i + 1, i + 2);
-			GsModel::Face f2 = GsModel::Face(i + 3, i + 4, i + 5);
-*/
 
 			torus->F.push() = f1;
-			torus->F.push() = f2;
+			torus->F.push() = GsModel::Face(i, i + 3, i + 1);
 
-			if (flat == false)
+			if (smooth)
 			{
-
-				//Calculating normals
-				GsVec orgin1((R * cos(phi)), (R * sin(phi)), (double)0);
-				GsVec orgin2((R * cos(phi + delta)), (R * sin(phi + delta)), (double)0);
-
-				GsVec nA = (A - orgin1);
-				GsVec nB = (B - orgin1);
-				GsVec nC = (C - orgin2);
-				GsVec nD = (D - orgin2);
-
-				torus->N.push() = nA;
-				torus->N.push() = nB;
-				torus->N.push() = nC;
-				torus->N.push() = nD;
+				GsVec k((float)(R * cos(phi)), (float)(R * sin(phi)), 0.0f);
+				GsVec h((float)(R * cos(phi + (float)(GS_2PI / n))), (float)(R * sin(phi + (float)(GS_2PI / n))), 0.0f);
+				
+				torus->N.push() = (GsVec((R + r * cos(theta)) * cos(phi), (R + r * cos(theta)) * sin(phi), r * sin(theta)) - k);
+				torus->N.push() = (GsVec((R + r * cos(theta + (float)(GS_2PI / n))) * cos(phi), (R + r * cos(theta + (float)(GS_2PI / n))) * sin(phi), r * sin(theta + (float)(GS_2PI / n))) - k);
+				torus->N.push() = (GsVec((R + r * cos(theta)) * cos(phi + (float)(GS_2PI / n)), (R + r * cos(theta)) * sin(phi + (float)(GS_2PI / n)), r * sin(theta)) - h);
+				torus->N.push() = (GsVec((R + r * cos(theta + (float)(GS_2PI / n))) * cos(phi + (float)(GS_2PI / n)), (R + r * cos(theta + (float)(GS_2PI / n))) * sin(phi + (float)(GS_2PI / n)), r * sin(theta + (float)(GS_2PI / n))) - k);
 
 				torus->set_mode(GsModel::Smooth, GsModel::NoMtl);
 			}
 			else
 			{
 				GsPnt nx;
-				nx.cross(C - A, D - C);
-				GsPnt ny;
-				ny.cross(D - A, B - D);
-
+				nx.cross(GsVec((R + r * cos(theta)) * cos(phi + (float)(GS_2PI / n)), (R + r * cos(theta)) * sin(phi + (float)(GS_2PI / n)), r * sin(theta)) - GsVec((R + r * cos(theta)) * cos(phi), (R + r * cos(theta)) * sin(phi), r * sin(theta)), GsVec((R + r * cos(theta + (float)(GS_2PI / n))) * cos(phi + (float)(GS_2PI / n)), (R + r * cos(theta + (float)(GS_2PI / n))) * sin(phi + (float)(GS_2PI / n)), r * sin(theta + (float)(GS_2PI / n))) - GsVec((R + r * cos(theta)) * cos(phi + (float)(GS_2PI / n)), (R + r * cos(theta)) * sin(phi + (float)(GS_2PI / n)), r * sin(theta)));
 				torus->N.push() = nx;
+
+				GsPnt ny;
+				ny.cross(GsVec((R + r * cos(theta + (float)(GS_2PI / n))) * cos(phi + (float)(GS_2PI / n)), (R + r * cos(theta + (float)(GS_2PI / n))) * sin(phi + (float)(GS_2PI / n)), r * sin(theta + (float)(GS_2PI / n))) - GsVec((R + r * cos(theta)) * cos(phi), (R + r * cos(theta)) * sin(phi), r * sin(theta)), GsVec((R + r * cos(theta + (float)(GS_2PI / n))) * cos(phi), (R + r * cos(theta + (float)(GS_2PI / n))) * sin(phi), r * sin(theta + (float)(GS_2PI / n))) - GsVec((R + r * cos(theta + (float)(GS_2PI / n))) * cos(phi + (float)(GS_2PI / n)), (R + r * cos(theta + (float)(GS_2PI / n))) * sin(phi + (float)(GS_2PI / n)), r * sin(theta + (float)(GS_2PI / n))));
 				torus->N.push() = ny;
 
 				torus->set_mode(GsModel::Flat, GsModel::NoMtl);
@@ -142,19 +103,17 @@ void MyViewer::build_scene()
 	}
 
 	sn = new SnModel(torus);
-	//SnGroup *T = new SnGroup;
-	//T->add(sn);
 	rootg()->add(sn);
 }
 
-void MyViewer::compute_segments(bool flat)
+void MyViewer::compute_segments(bool smooth)
 {
 
 	SnLines *l = new SnLines;
 	l->init();
 	l->color(GsColor::blue);
 
-	if (flat == true)
+	if (!smooth)
 	{
 		GsModel &m = *torus;
 		for (int i = 0; i < m.F.size(); ++i)
@@ -167,7 +126,7 @@ void MyViewer::compute_segments(bool flat)
 		}
 	}
 	else
-	{ //smooth
+	{
 		GsModel &m = *torus;
 		for (int i = 0; i < m.V.size(); ++i)
 		{
@@ -261,15 +220,12 @@ int MyViewer::handle_keyboard(const GsEvent &e)
 	switch (e.key)
 	{
 	case 'q':
-	{
 		n += 1.0f;
 		rootg()->remove_all();
 		build_scene();
 		render();
 		return 1;
-	}
 	case 'a':
-	{
 		if (n - 1.0f == 3.0f)
 			return 1;
 		n -= 1.0f;
@@ -277,80 +233,55 @@ int MyViewer::handle_keyboard(const GsEvent &e)
 		build_scene();
 		render();
 		return 1;
-	}
 	case 'w':
-	{
 		r += 0.1f;
 		rootg()->remove_all();
 		build_scene();
 		render();
 		return 1;
-	}
 	case 's':
-	{
 		r -= 0.1f;
 		rootg()->remove_all();
 		build_scene();
 		render();
 		return 1;
-	}
 	case 'e':
-	{
 		R += 0.1f;
 		rootg()->remove_all();
 		build_scene();
 		render();
 		return 1;
-	}
 	case 'd':
-	{
 		R -= 0.1f;
 		rootg()->remove_all();
 		build_scene();
 		render();
 		return 1;
-	}
 	case 'z':
-	{
-		flat = true;
+		smooth = false;
 		rootg()->remove_all();
 		build_scene();
 		render();
 		return 1;
-	} // Flat
 	case 'x':
-	{
-		flat = false;
+		smooth = true;
 		rootg()->remove_all();
 		build_scene();
 		render();
 		return 1;
-	} // Smooth
 	case 'c':
-	{
-		compute_segments(flat);
+		compute_segments(smooth);
 		build_scene();
 		render();
 		return 1;
-	} //normal
 	case 'v':
-	{
 		rootg()->remove_all();
 		build_scene();
 		render();
 		return 1;
-	} // clear all
-
 	case GsEvent::KeyEsc:
 		gs_exit();
 		return 1;
-	case 'n':
-	{
-		bool b = !_nbut->value();
-		_nbut->value(b);
-		show_normals(b);
-		return 1;
-	}
 	default:
 		gsout << "Key pressed: " << e.key << gsnl;
 	}
