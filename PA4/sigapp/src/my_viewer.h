@@ -5,13 +5,18 @@
 
 # include <sigogl/ui_button.h>
 # include <sigogl/ws_viewer.h>
-
+#include <sig/gs_model.h>
 // Viewer for this example:
 class MyViewer : public WsViewer
 {  protected :
 	enum MenuEv { EvNormals, EvAnimate, EvExit };
 	UiCheckButton* _nbut;
 	bool _animating;
+	GsModel* torus;
+	float r;
+	float R;
+	float n;
+	double delta;
    public :
 	MyViewer ( int x, int y, int w, int h, const char* l );
 	void build_ui ();
