@@ -6,7 +6,7 @@
 # include <sigogl/ui_button.h>
 # include <sigogl/ws_viewer.h>
 #include <sig/gs_model.h>
-// Viewer for this example:
+
 class MyViewer : public WsViewer
 {  protected :
 	enum MenuEv { EvNormals, EvAnimate, EvExit };

@@ -163,7 +163,7 @@ void MyViewer::compute_segments(bool flat)
 			const GsVec &b = m.V[m.F[i].b];
 			const GsVec &c = m.V[m.F[i].c];
 			GsVec fcenter = (a + b + c) / 3.0f;
-			l->push(fcenter, fcenter + m.N[i] * 50.0f);
+			l->push(fcenter, fcenter + normalize(m.N[i]) * 0.1f);
 		}
 	}
 	else
@@ -254,7 +254,7 @@ void MyViewer::show_normals(bool view)
 int MyViewer::handle_keyboard(const GsEvent &e)
 {
 	int ret = WsViewer::handle_keyboard(e);
-	gsout << "start: " << n << gsnl;
+
 	if (ret)
 		return ret;
 
@@ -263,7 +263,6 @@ int MyViewer::handle_keyboard(const GsEvent &e)
 	case 'q':
 	{
 		n += 1.0f;
-		gsout << "increase: " << n << gsnl;
 		rootg()->remove_all();
 		build_scene();
 		render();
@@ -274,7 +273,6 @@ int MyViewer::handle_keyboard(const GsEvent &e)
 		if (n - 1.0f == 3.0f)
 			return 1;
 		n -= 1.0f;
-		gsout << "decrease: " << n << gsnl;
 		rootg()->remove_all();
 		build_scene();
 		render();
