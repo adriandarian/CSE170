@@ -12,14 +12,6 @@ class MyViewer : public WsViewer
 	enum MenuEv { EvNormals, EvAnimate, EvExit };
 	UiCheckButton* _nbut;
 	bool _animating;
-	bool _smooth = true;
-	float R = 1.0f;
-	float r = 0.2f;
-	float n = 10.0f;
-	int a = 0;
-	int b = 1;
-	int c = 2;
-
    public :
 	MyViewer ( int x, int y, int w, int h, const char* l );
 	void build_ui ();
@@ -27,9 +19,8 @@ class MyViewer : public WsViewer
 	void build_scene ();
 	void show_normals ( bool view );
 	void run_animation ();
-	void compute_segments(bool smooth, bool view);
+	void compute_segments(bool flat);
 	virtual int handle_keyboard ( const GsEvent &e ) override;
 	virtual int uievent ( int e ) override;
-
 };
 
