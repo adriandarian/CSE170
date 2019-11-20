@@ -1,39 +1,38 @@
-#include <vector>
-#include <string>
-#include "my_viewer.h"
 
-#include <sigogl/ui_button.h>
-#include <sigogl/ui_radio_button.h>
-#include <sig/sn_primitive.h>
-#include <sig/sn_transform.h>
-#include <sig/sn_manipulator.h>
+# include "my_viewer.h"
 
-#include <sigogl/ws_run.h>
+# include <sigogl/ui_button.h>
+# include <sigogl/ui_radio_button.h>
+# include <sig/sn_primitive.h>
+# include <sig/sn_transform.h>
+# include <sig/sn_manipulator.h>
 
-MyViewer::MyViewer(int x, int y, int w, int h, const char *l) : WsViewer(x, y, w, h, l)
+# include <sigogl/ws_run.h>
+
+
+MyViewer::MyViewer(int x, int y, int w, int h, const char* l) : WsViewer(x, y, w, h, l)
 {
 	_nbut = 0;
 	_animating = false;
+
 	build_ui();
 	build_scene();
 }
 
 void MyViewer::build_ui()
 {
-	UiPanel *p, *sp;
-	UiManager *uim = WsWindow::uim();
+	UiPanel* p, * sp;
+	UiManager* uim = WsWindow::uim();
 	p = uim->add_panel("", UiPanel::HorizLeft);
 	p->add(new UiButton("View", sp = new UiPanel()));
-	{
-		UiPanel *p = sp;
-		p->add(_nbut = new UiCheckButton("Normals", EvNormals));
+	{	UiPanel* p = sp;
+	p->add(_nbut = new UiCheckButton("Normals", EvNormals));
 	}
 	p->add(new UiButton("Animate", EvAnimate));
-	p->add(new UiButton("Exit", EvExit));
-	p->top()->separate();
+	p->add(new UiButton("Exit", EvExit)); p->top()->separate();
 }
 
-void MyViewer::add_model(SnShape *s, GsVec p)
+void MyViewer::add_model(SnShape* s, GsVec p)
 {
 	// This method demonstrates how to add some elements to our scene graph: lines,
 	// and a shape, and all in a group under a SnManipulator.
@@ -43,13 +42,13 @@ void MyViewer::add_model(SnShape *s, GsVec p)
 	// You would then add the transform as 1st element of the group, and set g->separator(true).
 	// Your scene graph should always be carefully designed according to your application needs.
 
-	SnManipulator *manip = new SnManipulator;
+	SnManipulator* manip = new SnManipulator;
 	GsMat m;
 	m.translation(p);
 	manip->initial_mat(m);
 
-	SnGroup *g = new SnGroup;
-	SnLines *l = new SnLines;
+	SnGroup* g = new SnGroup;
+	SnLines* l = new SnLines;
 	l->color(GsColor::orange);
 	g->add(s);
 	g->add(l);
@@ -59,92 +58,111 @@ void MyViewer::add_model(SnShape *s, GsVec p)
 	rootg()->add(manip);
 }
 
-void MyViewer::build_scene(float shoulder = 0.0f, float elbow = 0.0f, float hand = 0.0f)
-{
-	g = new SnGroup; // to hold all the models and transformation
-	b = {b0, b1, b2};
-	pieces = {"rupperarm.m", "rlowerarm.m", "rhand.m"};
+void MyViewer::build_scene()
+{	
+	SnModel* model[3];
+	model[0] = new SnModel;
+	t[0] = new SnTransform;
+	if (!model[0]->model()->load("../../arm/rupperarm.m")) {
+		gsout << "rupperarm.m was not loaded" << gsnl;
+	}
+	model[0]->model()->smooth();
+	model[0]->model()->get_bounding_box(b0);
+	gsout << -b0.dz() / 2.0f << gsnl;
+	m[0].translation(GsVec(0, 0, -b0.dz() / 2.0f));
+	m[0].rotx(float(GS_PI / 12));
+	t[0]->set(m[0]);
 
-	for (int i = 0; i < 3; i++)
-	{
-		model[i] = new SnModel;
-		t[i] = new SnTransform;
+	model[1] = new SnModel;
+	t[1] = new SnTransform;
+	if (!model[1]->model()->load("../../arm/rlowerarm.m")) {
+		gsout << "rlowerarm.m was not loaded" << gsnl;
+	}
+	model[1]->model()->smooth();
+	model[1]->model()->get_bounding_box(b1);
+	m[1].translation(GsVec(0, 0, (b1.dz() / 2.0f) * 2));
+	mt[1].rotx(float(-GS_PI / 12));
+	m[1] = m[1] * mt[1];
+	t[1]->set(m[1]);
 
-		if (!model[i]->model()->load(("../../arm/" + pieces[i]).c_str()))
-		{
-			gsout << (pieces[i] + " was not loaded").c_str() << gsnl;
-		}
 
-		// model[i]->model()->centralize();
-		model[i]->model()->get_bounding_box(b0);
-		if (i == 0)
-		{
-			float x = 0.0f;
-			float y = 0.0f;
-			float z = -(b[i].dz() / 2.0f) + 24.0f;
-			m[i].translation(GsVec(x, y, z));
-			m[i].roty(shoulder);
-			gsout << z << gsnl;
-		}
-		else if (i == 1)
-		{
-			float x = 0.0f;
-			float y = 0.0f;
-			float z = b[i].dz() / 2.0f;
-			m[i].translation(GsVec(x, y, z));
-			m[i].roty(elbow);
-			gsout << z << gsnl;
-		}
-		else if (i == 2)
-		{
-			float x = 0.0f;
-			float y = 0.0f;
-			float z = -((b[1].dz() / 2.0f) + b2.dz());
-			m[i].translation(GsVec(x, y, z));
-			m[i].roty(hand);
-			gsout << z << gsnl;
-		}
-		t[i]->set(m[0]);
+	model[2] = new SnModel;
+	t[2] = new SnTransform;
+	if (!model[2]->model()->load("../../arm/rhand.m")) {
+		gsout << "rhand.m was not loaded" << gsnl;
+	}
+	model[2]->model()->get_bounding_box(b1);
+	m[2].translation(GsVec(0, 0, -b1.dz() + b1.dz() + 25.0f));
+	t[2]->set(m[2]);
 
+	for (int i = 0; i < 3; i++) {
 		g->add(t[i]);
 		g->add(model[i]);
 	}
-
 	rootg()->add(g);
 }
 
 // Below is an example of how to control the main loop of an animation:
 void MyViewer::run_animation()
 {
-	if (_animating)
-		return; // avoid recursive calls
+	if (_animating) return; // avoid recursive calls
 	_animating = true;
 
-	int ind = gs_random(0, rootg()->size() - 1);			 // pick one child
-	SnManipulator *manip = rootg()->get<SnManipulator>(ind); // access one of the manipulators
-	GsMat m = manip->mat();
-
 	double frdt = 1.0 / 30.0; // delta time to reach given number of frames per second
-	double v = 4;			  // target velocity is 1 unit per second
-	double t = 0, lt = 0, t0 = gs_time();
+	double time = 0, lt = 0, t0 = gs_time();
 	do // run for a while:
 	{
-		while (t - lt < frdt)
-		{
-			ws_check();
-			t = gs_time() - t0;
-		} // wait until it is time for next frame
-		double yinc = (t - lt) * v;
-		if (t > 2)
-			yinc = -yinc; // after 2 secs: go down
-		lt = t;
-		m.e24 += (float)yinc;
-		if (m.e24 < 0)
-			m.e24 = 0; // make sure it does not go below 0
-		manip->initial_mat(m);
-		render();   // notify it needs redraw
-		ws_check(); // redraw now
-	} while (m.e24 > 0);
+		while (time - lt < frdt) { ws_check(); time = gs_time() - t0; } // wait until it is time for next frame
+		lt = time;
+		if (time < 2) {
+			if (time < 1) {
+				mt[0].rotz(upperarm);
+				mt[1].rotx(-lowerarm);
+				mt[2].roty(hand);
+
+				m[0] = m[0] * mt[0];
+				m[1] = m[1] * mt[1];
+				m[2] = m[2] * mt[2];
+
+				t[0]->set(m[0]);
+				t[1]->set(m[1]);
+				t[2]->set(m[2]);
+
+				redraw();
+			}
+		}
+		if (time > 3 && time < 4) {
+			mt[0].rotx(-upperarm);
+			mt[1].rotx(-lowerarm + 0.01f);
+			mt[2].roty(-hand);
+
+			m[0] = m[0] * mt[0];
+			m[1] = m[1] * mt[1];
+			m[2] = m[2] * mt[2];
+			
+			t[0]->set(m[0]);
+			t[1]->set(m[1]);
+			t[2]->set(m[2]);
+
+			redraw();
+		}
+
+		if (time > 6 && time < 8) {
+			mt[0].rotx(upperarm);
+			mt[1].rotx(lowerarm);
+			mt[2].roty(hand);
+
+			m[0] = m[0] * mt[0];
+			m[1] = m[1] * mt[1];
+			m[2] = m[2] * mt[2];
+
+			t[0]->set(m[0]);
+			t[1]->set(m[1]);
+			t[2]->set(m[2]);
+
+			redraw();
+		}
+	} while (time < 11);
 	_animating = false;
 }
 
@@ -153,117 +171,98 @@ void MyViewer::show_normals(bool view)
 	// Note that primitives are only converted to meshes in GsModel
 	// at the first draw call.
 	GsArray<GsVec> fn;
-	SnGroup *r = (SnGroup *)root();
+	SnGroup* r = (SnGroup*)root();
 	for (int k = 0; k < r->size(); k++)
 	{
-		SnManipulator *manip = r->get<SnManipulator>(k);
-		SnShape *s = manip->child<SnGroup>()->get<SnShape>(0);
-		SnLines *l = manip->child<SnGroup>()->get<SnLines>(1);
-		if (!view)
-		{
-			l->visible(false);
-			continue;
-		}
+		SnManipulator* manip = r->get<SnManipulator>(k);
+		SnShape* s = manip->child<SnGroup>()->get<SnShape>(0);
+		SnLines* l = manip->child<SnGroup>()->get<SnLines>(1);
+		if (!view) { l->visible(false); continue; }
 		l->visible(true);
-		if (!l->empty())
-			continue; // build only once
+		if (!l->empty()) continue; // build only once
 		l->init();
 		if (s->instance_name() == SnPrimitive::class_name)
 		{
-			GsModel &m = *((SnModel *)s)->model();
+			GsModel& m = *((SnModel*)s)->model();
 			m.get_normals_per_face(fn);
-			const GsVec *n = fn.pt();
+			const GsVec* n = fn.pt();
 			float f = 0.33f;
 			for (int i = 0; i < m.F.size(); i++)
 			{
-				const GsVec &a = m.V[m.F[i].a];
-				l->push(a, a + (*n++) * f);
-				const GsVec &b = m.V[m.F[i].b];
-				l->push(b, b + (*n++) * f);
-				const GsVec &c = m.V[m.F[i].c];
-				l->push(c, c + (*n++) * f);
+				const GsVec& a = m.V[m.F[i].a]; l->push(a, a + (*n++) * f);
+				const GsVec& b = m.V[m.F[i].b]; l->push(b, b + (*n++) * f);
+				const GsVec& c = m.V[m.F[i].c]; l->push(c, c + (*n++) * f);
 			}
 		}
 	}
 }
 
-int MyViewer::handle_keyboard(const GsEvent &e)
-{
-	int ret = WsViewer::handle_keyboard(e); // 1st let system check events
-	float a = 0.05f;
+void MyViewer::upperArmUp() {
 
-	if (ret)
-		return ret;
+	gsout << "q" << gsnl;
+	mt[0].rotx(-upperarm);
+	m[0] = m[0] * mt[0];
+	t[0]->set(m[0]);
+	redraw();
+}
+
+void MyViewer::upperArmDown() {
+	gsout << "a" << gsnl;
+	mt[0].rotx(upperarm);
+	m[0] = m[0] * mt[0];
+	t[0]->set(m[0]);
+	redraw();
+}
+
+void MyViewer::lowerArmUp() {
+gsout << "w" << gsnl;
+	mt[1].rotx(-lowerarm);
+	m[1] = m[1] * mt[1];
+	t[1]->set(m[1]);
+	redraw();
+}
+
+void MyViewer::lowerArmDown() {
+	gsout << "s" << gsnl;
+	mt[1].rotx(lowerarm);
+	m[1] = m[1] * mt[1];
+	t[1]->set(m[1]);
+	redraw();
+}
+
+void MyViewer::handUp() {
+	gsout << "e" << gsnl;
+	mt[2].rotx(-hand);
+	m[2] = m[2] * mt[2];
+	t[2]->set(m[2]);
+	redraw();
+}
+
+void MyViewer::handDown() {
+	gsout << "d" << gsnl;
+	mt[2].rotx(hand);
+	m[2] = m[2] * mt[2];
+	t[2]->set(m[2]);
+	redraw();
+}
+
+int MyViewer::handle_keyboard(const GsEvent& e)
+{	
+	int ret = WsViewer::handle_keyboard(e); // 1st let system check events
+	if (ret) return ret;
 
 	switch (e.key)
 	{
-	case GsEvent::KeyEsc:
-		gs_exit();
-		return 1;
-	case 'n':
-	{
-		bool b = !_nbut->value();
-		_nbut->value(b);
-		show_normals(b);
-		return 1;
-	}
-	case GsEvent::KeyQ:
-	{
-		shoulder -= a;
-		rootg()->remove_all();
-		build_scene(shoulder, elbow, hand);
+	case GsEvent::KeyEsc: gs_exit(); return 1;
+	case 'q': upperArmUp(); return 1; 
+	case 'a': upperArmDown(); return 1;
+	case 'w': lowerArmUp(); return 1; 
+	case 's': lowerArmDown(); return 1;
+	case 'e': handUp(); return 1;
+	case 'd': handDown(); return 1;
 
-
-
-
-		// m[0].rotz(shoulder);
-	
-		// t[0]->set(m[0]);
-		// render();
-		// ws_check();
-		return 1;
-	}
-	case GsEvent::KeyA:
-	{
-		shoulder += a;
-		rootg()->remove_all();
-		build_scene(shoulder, elbow, hand);
-
-
-
-		// m[0].roty(shoulder);
-	
-		// // gsout << m[0].getrans << gsnl;
-		// t[0]->set(m[0]);
-		// // g->add(t[0]);
-		
-		// // rootg()->add(g);
-		// render();
-		// ws_check();
-		return 1;
-	}
-	case GsEvent::KeyW:
-	{
-		redraw();
-		return 1;
-	}
-	case GsEvent::KeyS:
-	{
-		redraw();
-		return 1;
-	}
-	case GsEvent::KeyE:
-	{
-		redraw();
-		return 1;
-	}
-	case GsEvent::KeyD:
-	{
-		redraw();
-		return 1;
-	}
-	default:
-		gsout << "Key pressed: " << e.key << gsnl;
+	case 'n': { bool b = !_nbut->value(); _nbut->value(b); show_normals(b); return 1; }
+	default: gsout << "Key pressed: " << e.key << gsnl;
 	}
 
 	return 0;
@@ -273,14 +272,9 @@ int MyViewer::uievent(int e)
 {
 	switch (e)
 	{
-	case EvNormals:
-		show_normals(_nbut->value());
-		return 1;
-	case EvAnimate:
-		run_animation();
-		return 1;
-	case EvExit:
-		gs_exit();
+	case EvNormals: show_normals(_nbut->value()); return 1;
+	case EvAnimate: run_animation(); return 1;
+	case EvExit: gs_exit();
 	}
 	return WsViewer::uievent(e);
 }
