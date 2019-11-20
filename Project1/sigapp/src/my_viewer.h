@@ -30,7 +30,18 @@ protected:
 	UiCheckButton *_nbut;
 	bool _animating;
 	bool cameraMovement = true;
-	float x = 0.0, y = 0.0, z = 0.0;
+	float xHead = 0.0, yHead = 0.0, zHead = 0.0;
+	float xBody = 0.0, yBody = 0.0, zBody = 0.0;
+	float xRightArm = 0.0, yRightArm = 0.0, zRightArm = 0.0;
+	float xLeftArm = 0.0, yLeftArm = 0.0, zLeftArm = 0.0;
+	float xFan = 0.0, yFan = 0.0, zFan = 0.0;
+	std::vector<std::vector<float>> pos = {
+		{xHead, yHead, zHead},
+		{xBody, yBody, zBody},
+		{xRightArm, yRightArm, zRightArm},
+		{xLeftArm, yLeftArm, zLeftArm},
+		{xFan, yFan, zFan}
+	};
 	SnGroup *g = new SnGroup;
 	SnGroup *Head = new SnGroup;
 	SnGroup *Body = new SnGroup;
@@ -44,8 +55,21 @@ protected:
 	GsMat mt[5];
 	GsBox b0, b1, b2, b3, b4;
 	std::vector<GsBox> b = { b0, b1, b2, b3, b4};
-	std::vector<std::string> pieces;
-	std::vector<std::string> sep;
+	std::vector<std::string> pieces = {
+		"Head/tinker.obj",
+		"Body/tinker.obj",
+		"Right-Arm/tinker.obj",
+		"Left-Arm/tinker.obj",
+		"Fan/tinker.obj"
+	};
+	std::vector<SnGroup *> sep = {
+		Head,
+		Body,
+		RightArm,
+		LeftArm,
+		Fan
+	};
+	std::vector<int> numRotations = {6, 3, 6, 6, 6};
 
 public:
 	MyViewer(int x, int y, int w, int h, const char *l);

@@ -58,30 +58,8 @@ void MyViewer::add_model ( SnShape* s, GsVec p )
 
 void MyViewer::build_scene ()
 {
-	pieces = {
-		"Head/tinker.obj",
-		"Body/tinker.obj",
-		"Right-Arm/tinker.obj",
-		"Left-Arm/tinker.obj",
-		"Fan/tinker.obj"
-	};
-	sep = {
-		"Head",
-		"Body",
-		"RightArm",
-		"LeftArm",
-		"Fan"
-	};
-
 	for (int i = 0; i < pieces.size(); ++i) {
-		switch (i) {
-			case 0: (Head)->separator(true); 
-			case 1: (Body)->separator(true); 
-			case 2: (RightArm)->separator(true); 
-			case 3: (LeftArm)->separator(true);
-			case 4: (Fan)->separator(true);  
-		}
-
+		(sep[i])->separator(true);
 		model[i] = new SnModel;
 		t[i] = new SnTransform;
 
@@ -90,37 +68,13 @@ void MyViewer::build_scene ()
 		}
 
 		model[i]->model()->get_bounding_box(b[i]);
-		m[i].translation(GsVec(x, y, z));
-		// m[i].rotx((float)GS_PI/60);
+		m[i].translation(GsVec(pos[i][0], pos[i][1], pos[i][2]));
+		// m[i].rotx((float)GS_PI/2);
 		t[i]->set(m[i]);
 
-		switch (i) {
-			case 0: {
-				Head->add(t[i]);
-				Head->add(model[i]);
-				rootg()->add(Head);
-			} 
-			case 1: {
-				Body->add(t[i]);
-				Body->add(model[i]);
-				rootg()->add(Body);
-			} 
-			case 2: {
-				RightArm->add(t[i]);
-				RightArm->add(model[i]);
-				rootg()->add(RightArm);
-			}  
-			case 3: {
-				LeftArm->add(t[i]);
-				LeftArm->add(model[i]);
-				rootg()->add(LeftArm);
-			} 
-			case 4: {
-				Fan->add(t[i]);
-				Fan->add(model[i]);
-				rootg()->add(Fan);
-			}  
-		}
+		sep[i]->add(t[i]);
+		sep[i]->add(model[i]);
+		rootg()->add(sep[i]);
 	}
 }
 
@@ -204,7 +158,8 @@ int MyViewer::handle_keyboard ( const GsEvent &e )
 		// Model Movements and Translations
 		case GsEvent::KeyUp: {
 			for (int i = 0; i < pieces.size(); ++i) {
-				m[i].translation(GsVec(x, y + (float)(10), z));
+				pos[i][1] += 10.0f;
+				m[i].translation(GsVec(pos[i][0], pos[i][1], pos[i][2]));
 				m[i] = m[i] * mt[i];
 				t[i]->set(m[i]);
 				redraw();
@@ -212,9 +167,9 @@ int MyViewer::handle_keyboard ( const GsEvent &e )
 			return 1;
 		}
 		case GsEvent::KeyRight: {
-			x += 10.0f;
 			for (int i = 0; i < pieces.size(); ++i) {
-				m[i].translation(GsVec(x, y, z));
+				pos[i][0] += 10.0f;
+				m[i].translation(GsVec(pos[i][0], pos[i][1], pos[i][2]));
 				m[i] = m[i] * mt[i];
 				t[i]->set(m[i]);
 				redraw();
@@ -223,7 +178,8 @@ int MyViewer::handle_keyboard ( const GsEvent &e )
 		}
 		case GsEvent::KeyDown: {
 			for (int i = 0; i < pieces.size(); ++i) {
-				m[i].translation(GsVec(x, y - (float)(10), z));
+				pos[i][1] -= 10.0f;
+				m[i].translation(GsVec(pos[i][0], pos[i][1], pos[i][2]));
 				m[i] = m[i] * mt[i];
 				t[i]->set(m[i]);
 				redraw();
@@ -232,7 +188,8 @@ int MyViewer::handle_keyboard ( const GsEvent &e )
 		}
 		case GsEvent::KeyLeft: {
 			for (int i = 0; i < pieces.size(); ++i) {
-				m[i].translation(GsVec(x - (float)(10), y, z));
+				pos[i][0] -= 10.0f;
+				m[i].translation(GsVec(pos[i][0], pos[i][1], pos[i][2]));
 				m[i] = m[i] * mt[i];
 				t[i]->set(m[i]);
 				redraw();
@@ -242,88 +199,117 @@ int MyViewer::handle_keyboard ( const GsEvent &e )
 
 		// Rotate the Head Left and Right
 		case 'q': {
-			m[0].rotx((float)GS_PI/60);
-			m[0] = m[0] * mt[0];
-			t[0]->set(m[0]);
-			redraw();
+			if (numRotations[0] < 12) {
+				mt[0].rotz((float)GS_PI/100);
+				m[0] = m[0] * mt[0];
+				t[0]->set(m[0]);
+				redraw();
+				numRotations[0]++;
+			}
 			return 1;
 		}
 		case 'a': {
-			m[0].rotx(-(float)GS_PI/60);
-			m[0] = m[0] * mt[0];
-			t[0]->set(m[0]);
-			redraw();
+			if (numRotations[0] >= 0) {
+				mt[0].rotz(-(float)GS_PI/100);
+				m[0] = m[0] * mt[0];
+				t[0]->set(m[0]);
+				redraw();
+				numRotations[0]--;
+			}
 			return 1;
 		}
 
 		// Roate the Body Left and Right
 		case 'w': {
-			m[1].rotx((float)GS_PI/60);
-			m[1] = m[1] * mt[1];
-			t[1]->set(m[1]);
-			redraw();
+			if (numRotations[1] < 8) {
+				mt[1].rotz((float)GS_PI/600);
+				m[1] = m[1] * mt[1];
+				t[1]->set(m[1]);
+				redraw();
+				numRotations[1]++;
+			}
 			return 1;
 		}
 		case 's': {
-			m[1].rotx(-(float)GS_PI/60);
-			m[1] = m[1] * mt[1];
-			t[1]->set(m[1]);
-			redraw();
+			if (numRotations[1] >= 0) {
+				mt[1].rotz(-(float)GS_PI/600);
+				m[1] = m[1] * mt[1];
+				t[1]->set(m[1]);
+				redraw();
+				numRotations[1]--;
+			}
 			return 1;
 		}
 
 		// Rotate the Right Arm Up and Down
 		case 'e': {
-			m[2].rotx((float)GS_PI/60);
-			m[2] = m[2] * mt[2];
-			t[2]->set(m[2]);
-			redraw();
+			if (numRotations[2] < 7) {
+				mt[2].rotz((float)GS_PI/60);
+				m[2] = m[2] * mt[2];
+				t[2]->set(m[2]);
+				redraw();
+				numRotations[2]++;
+			}
 			return 1;
 		}
 		case 'd': {
-			m[2].rotx(-(float)GS_PI/60);
-			m[2] = m[2] * mt[2];
-			t[2]->set(m[2]);
-			redraw();
+			if (numRotations[2] >= -1) {
+				mt[2].rotz(-(float)GS_PI/60);
+				m[2] = m[2] * mt[2];
+				t[2]->set(m[2]);
+				redraw();
+				numRotations[2]--;
+			}
 			return 1;
 		}
 
 		// Rotate the Left Arm Up and Down
 		case 'r': {
-			m[3].rotx((float)GS_PI/60);
-			m[3] = m[3] * mt[3];
-			t[3]->set(m[3]);
-			redraw();
+			if (numRotations[3] < 7) {
+				mt[3].rotz((float)GS_PI/60);
+				m[3] = m[3] * mt[3];
+				t[3]->set(m[3]);
+				redraw();
+				numRotations[3]++;
+			}
 			return 1;
 		}
 		case 'f': {
-			m[3].rotx(-(float)GS_PI/60);
-			m[3] = m[3] * mt[3];
-			t[3]->set(m[3]);
-			redraw();
+			if (numRotations[3] >= -1) {
+				mt[3].rotz(-(float)GS_PI/60);
+				m[3] = m[3] * mt[3];
+				t[3]->set(m[3]);
+				redraw();
+				numRotations[3]--;
+			}
 			return 1;
 		}
 
-		// Rotate Fan Back anf Forth
+		// Rotate Fan Back and Forth
 		case 't': {
-			m[4].rotx((float)GS_PI/60);
-			m[4] = m[4] * mt[4];
-			t[4]->set(m[4]);
-			redraw();
+			if (numRotations[4] < 8) {
+				mt[4].rotx((float)GS_PI/100);
+				m[4] = m[4] * mt[4];
+				t[4]->set(m[4]);
+				redraw();
+				numRotations[4]++;
+			}
 			return 1;
 		}
 		case 'g': {
-			m[4].rotx(-(float)GS_PI/60);
-			m[4] = m[4] * mt[4];
-			t[4]->set(m[4]);
-			redraw();
+			if (numRotations[4] >= 0) {
+				mt[4].rotx(-(float)GS_PI/100);
+				m[4] = m[4] * mt[4];
+				t[4]->set(m[4]);
+				redraw();
+				numRotations[4]--;
+			}
 			return 1;
 		}
 
 		// Camera Movement
 		case ' ': {
 			cameraMovement = !cameraMovement; 
-			// return 1;
 		}
 		default: gsout<<"Key pressed: "<<e.key<<gsnl;
 	}
