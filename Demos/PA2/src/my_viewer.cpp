@@ -154,13 +154,13 @@ void MyViewer::update_shadow ()
 		0, 1, 0, 0);
 	_tShadow1->get() = T2*shadowTdial*T1;
 
-	R-=0.001f;
-	GsMat shadowT(
-		-R, 0, 0, 0,
-		0, -R, 0, 0,
-		0, 0, -R, 0,
-		0, 1, 0, 0);
-	_tShadow2->get() = T2*shadowT*T1;
+	// R-=0.001f;
+	// GsMat shadowT(
+	// 	-R, 0, 0, 0,
+	// 	0, -R, 0, 0,
+	// 	0, 0, -R, 0,
+	// 	0, 1, 0, 0);
+	// _tShadow2->get() = T2*shadowT*T1;
 
 	render();
 }

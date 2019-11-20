@@ -79,7 +79,7 @@ void MyViewer::build_scene ()
 }
 
 // Below is an example of how to control the main loop of an animation:
-void MyViewer::run_animation ()
+void MyViewer::run_animation(bool cameraMovement)
 {
 	if ( _animating ) return; // avoid recursive calls
 	_animating = true;
@@ -92,17 +92,24 @@ void MyViewer::run_animation ()
 	double v = 4; // target velocity is 1 unit per second
 	double t=0, lt=0, t0=gs_time();
 	do // run for a while:
-	{	while ( t-lt<frdt ) { ws_check(); t=gs_time()-t0; } // wait until it is time for next frame
+	{	
+		while ( t-lt<frdt ) { 
+			ws_check(); 
+			t = gs_time() - t0;
+		} // wait until it is time for next frame
+
 		lt = gs_time() - t0;
+
 		if (cameraMovement) {
 			camera().eye.x += 0.01f;
 			camera().center.x += 0.01f;
 			camera().up.x += 0.01f;
 		}
+
 		message().setf("localtime=%f", lt);
 		render(); // notify it needs redraw
 		ws_check(); // redraw now
-	}	while ( _animating );
+	}	while ( lt > 0 );
 	_animating = false;
 }
 
@@ -297,7 +304,7 @@ int MyViewer::handle_keyboard ( const GsEvent &e )
 			return 1;
 		}
 		case 'g': {
-			if (numRotations[4] >= 0) {
+			if (numRotations[4] >= 5) {
 				mt[4].rotx(-(float)GS_PI/100);
 				m[4] = m[4] * mt[4];
 				t[4]->set(m[4]);
@@ -308,8 +315,10 @@ int MyViewer::handle_keyboard ( const GsEvent &e )
 		}
 
 		// Camera Movement
-		case ' ': {
-			cameraMovement = !cameraMovement; 
+		case GsEvent::KeySpace: {
+			gsout << _animating << gsnl;
+			// _animating = false;
+			run_animation(!cameraMovement);
 		}
 		default: gsout<<"Key pressed: "<<e.key<<gsnl;
 	}
@@ -321,7 +330,7 @@ int MyViewer::uievent ( int e )
 {
 	switch ( e )
 	{	case EvNormals: show_normals(_nbut->value()); return 1;
-		case EvAnimate: run_animation(); return 1;
+		case EvAnimate: run_animation(!cameraMovement); return 1;
 		case EvExit: gs_exit();
 	}
 	return WsViewer::uievent(e);

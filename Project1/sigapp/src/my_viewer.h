@@ -77,7 +77,7 @@ public:
 	void add_model(SnShape *s, GsVec p);
 	void build_scene();
 	void show_normals(bool view);
-	void run_animation();
+	void run_animation(bool cameraMovement);
 	virtual int handle_keyboard(const GsEvent &e) override;
 	virtual int uievent(int e) override;
 };
