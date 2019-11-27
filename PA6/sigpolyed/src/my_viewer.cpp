@@ -92,15 +92,28 @@ static GsPnt2 eval_curveY(float t, const GsArray<GsPnt2> &P)
 /*! Beziar of order n for given n=P.size()-1 control points, t in [0,1] */
 static GsPnt2 eval_bezier(float t, const GsArray<GsPnt2> &P)
 {
+	// Bezier Formulation
+	int n = P.size() - 1;
+	GsPnt2 point;
+	for (int i = 0; i <= n; ++i) {
+		point += P[i] * ((gs_fact(n) / (gs_fact(i) * gs_fact(n - i)) * gs_pow(t, i) * gs_pow(1 - t, n - i)));
+	}
+	return point;
+}
+
+/*! Beziar of order n for given n=P.size()-1 control points, t in [0,1] */
+static GsPnt bezier(float t, const GsArray<GsPnt> &P)
+{
 	// Bezier functions
 	std::vector<float> B = {
 		gs_pow((1.0f - t), 3),
-		gs_pow((1.0f - t), 2) * 3.0f *t,
+		gs_pow((1.0f - t), 2) * 3.0f * t,
 		3.0f * (1.0f - t) * gs_pow(t, 2),
-		gs_pow(t, 3)};
+		gs_pow(t, 3),
+	};
 
 	// Bezier Formulation
-	GsPnt2 point;
+	GsPnt point;
 	int n = P.size() - 1;
 	for (int i = 0; i <= n; i++)
 	{
@@ -139,53 +152,41 @@ static GsPnt2 eval_bspline(float t, int k, const GsArray<GsPnt2> &P)
 /*! Evaluates a Catmull-Rom cubic spline, n=P.size()-1, t in [0,n-2] */
 static GsPnt2 crspline(float t, const GsArray<GsPnt2> &P)
 {
-	int ti = (int)t;
-	// auto I = [&](int i) -> GsPnt2 {
-	// 	return (P[i + 1] - P[i - 1]) / 2.0f;
-	// };
+	GsArray<GsPnt2> T = GsArray<GsPnt2>(4);
+	T[0] = P[int(t) + 1];
+	T[1] = P[int(t) + 1] + GsPnt2((P[int(t) + 2] - P[int(t)]) / 2.0f) / 3.0f;
+	T[2] = P[int(t) + 2] - GsPnt2((P[int(t) + 3] - P[int(t) + 1]) / 2.0f) / 3.0f;
+	T[3] = P[int(t) + 2];
 
-	GsArray<GsPnt2> Pi = GsArray<GsPnt2>(4);
-	Pi[0] = P[ti + 1];
-	Pi[1] = P[ti + 1] + GsPnt2((P[ti + 2] - P[ti]) / 2.0f) / 3.0f;
-	Pi[2] = P[ti + 2] - GsPnt2((P[ti + 3] - P[ti + 1]) / 2.0f) / 3.0f;
-	Pi[3] = P[ti + 2];
-
-	return eval_bezier(t - ti, Pi);
+	return eval_bezier(t - int(t), T);
 }
 
 /*! Evaluates a Bessel-Overhauser spline, n=P.size()-1, t in [0,n-2] */
 static GsPnt2 bospline(float t, const GsArray<GsPnt2>& P)
 {
-	int ti = (int)t;
-	GsPnt2 point;
-	GsPnt2 ip = (P[ti + 3] - P[ti + 1]) / 2.0f;
-	GsPnt2 im = (P[ti + 2] - P[ti]) / 2.0f;
 	auto bosplinePos = [&](float t, const GsArray<GsPnt2>& P) -> GsPnt2 {
-		int ti = (int)t;
-		float dmm = (P[ti + 1] - P[ti]).len();
-		float dmp = (P[ti + 2] - P[ti + 1]).len();
-		GsPnt2 vmm = (P[ti + 1] - P[ti]) / dmm;
-		GsPnt2 vmp = (P[ti + 2] - P[ti + 1]) / dmp;
-		GsPnt2 vm = ((vmp * dmm) + (vmm * dmp)) / (dmm + dmp);
-		return (vm * dmp);
+		float m = (P[int(t) + 1] - P[int(t)]).len();
+		float n = (P[int(t) + 2] - P[int(t) + 1]).len();
+		return ((((((P[int(t) + 2] - P[int(t) + 1]) / n) * m) + (((P[int(t) + 1] - P[int(t)]) / m) * n)) / (m + n)) * n);
 	};
 	auto bosplineNeg = [&](float t, const GsArray<GsPnt2>& P) -> GsPnt2 {
-		int ti = int(t);
-		float dpm = (P[ti + 2] - P[ti + 1]).len();
-		float dpp = (P[ti + 3] - P[ti + 2]).len();
-		GsPnt2 vpm = (P[ti + 2] - P[ti + 1]) / dpm;
-		GsPnt2 vpp = (P[ti + 3] - P[ti + 2]) / dpp;
-		GsPnt2 vp = ((vpp * dpm) + (vpm * dpp)) / (dpm + dpp);
-		return (vp * dpm);
+		float m = (P[int(t) + 2] - P[int(t) + 1]).len();
+		float n = (P[int(t) + 3] - P[int(t) + 2]).len();
+		return ((((((P[int(t) + 3] - P[int(t) + 2]) / n) * m) + (((P[int(t) + 2] - P[int(t) + 1]) / m) * n)) / (m + n)) * m);
 	};
 
-	GsArray<GsPnt2> Pi = GsArray<GsPnt2>(4);
-	Pi[0] = P[ti + 1];
-	Pi[1] = P[ti + 1] + bosplinePos(t, P) / 3.0f;
-	Pi[2] = P[ti + 2] - bosplineNeg(t, P) / 3.0f;
-	Pi[3] = P[ti + 2];
+	GsArray<GsPnt2> T = GsArray<GsPnt2>(4);
+	T[0] = P[int(t) + 1];
+	T[1] = P[int(t) + 1] + bosplinePos(t, P) / 3.0f;
+	T[2] = P[int(t) + 2] - bosplineNeg(t, P) / 3.0f;
+	T[3] = P[int(t) + 2];
 
-	return eval_bezier(t - ti, Pi);
+	return eval_bezier(t - int(t), T);
+}
+
+void MyViewer::draw(GsPnt2 P) {
+	GsPnt T(P);
+	gsout << T << gsnl;
 }
 
 void MyViewer::update_scene()
@@ -198,15 +199,19 @@ void MyViewer::update_scene()
 
 	// Access the control polygon:
 	GsPolygon &P = _polyed->polygon(0);
-	float deltat = _slider->value();
+	float deltaT = _slider->value();
 	if (_viewA->value()) // show curve
 	{
 		// Add your curves below and select the correct one(s) to be displayed.
 		// As an example, below we have a linear interpolation between endpoints:
 		_curveA->begin_polyline();
-		for (float t = 0.0f; t < 1.0f; t += deltat) // note: the t range may change according to the curve
+		for (float t = 0.0f; t < 1.0f; t += deltaT) // note: the t range may change according to the curve
 		{
-			_curveA->push(eval_bezier(t, P));
+			if (!ThreeD) {
+				_curveA->push(eval_bezier(t, P));
+			} else {
+				_curveA->push(eval_bezier(t, P));
+			}
 		}
 		// _curveA->push(P.top()); // ensure final point is there
 		_curveA->end_polyline();
@@ -216,7 +221,7 @@ void MyViewer::update_scene()
 		// Add your curves below and select the correct one(s) to be displayed.
 		// As an example, below we have a linear interpolation between endpoints:
 		_curveB->begin_polyline();
-		for (float t = 2.0f; t < P.size(); t += deltat) // note: the t range may change according to the curve
+		for (float t = 2.0f; t < P.size(); t += deltaT) // note: the t range may change according to the curve
 		{
 			_curveB->push(eval_bspline(t, 3, P));
 		}
@@ -228,7 +233,7 @@ void MyViewer::update_scene()
 		// Add your curves below and select the correct one(s) to be displayed.
 		// As an example, below we have a linear interpolation between endpoints:
 		_curveC->begin_polyline();
-		for (float t = 0.0f; t < P.size() - 3.0f; t += deltat) // note: the t range may change according to the curve
+		for (float t = 0.0f; t < P.size() - 3.0f; t += deltaT) // note: the t range may change according to the curve
 		{
 			_curveC->push(crspline(t, P));
 		}
@@ -240,7 +245,7 @@ void MyViewer::update_scene()
 		// Add your curves below and select the correct one(s) to be displayed.
 		// As an example, below we have a linear interpolation between endpoints:
 		_curveD->begin_polyline();
-		for (float t = 0.0f; t < 1.0f; t += deltat) // note: the t range may change according to the curve
+		for (float t = 0.0f; t < 1.0f; t += deltaT) // note: the t range may change according to the curve
 		{
 			_curveD->push(bospline(t, P));
 		}
@@ -269,7 +274,7 @@ int MyViewer::uievent(int e)
 	}
 	case GsEvent::KeySpace:
 	{
-
+		ThreeD = !ThreeD;
 		return 1;
 	}
 	}

@@ -24,10 +24,12 @@ protected:
 	UiSlider *_slider;
 	SnPolyEditor *_polyed;
 	SnLines2 *_curveA, *_curveB, *_curveC, *_curveD;
+	bool ThreeD = false;
 
 public:
 	MyViewer(int x, int y, int w, int h, const char *l);
 	void build_ui();
+	void draw(GsPnt2 P);
 	void update_scene();
 	virtual int uievent(int e) override;
 };
