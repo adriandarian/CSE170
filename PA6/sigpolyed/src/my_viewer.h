@@ -16,12 +16,14 @@ protected:
 		EvExit,
 		EvViewCurveA,
 		EvViewCurveB,
+		EvViewCurveC,
+		EvViewCurveD,
 		EvDeltaT
 	};
-	UiCheckButton *_viewA, *_viewB;
+	UiCheckButton *_viewA, *_viewB, *_viewC, *_viewD;
 	UiSlider *_slider;
 	SnPolyEditor *_polyed;
-	SnLines2 *_curveA;
+	SnLines2 *_curveA, *_curveB, *_curveC, *_curveD;
 
 public:
 	MyViewer(int x, int y, int w, int h, const char *l);
